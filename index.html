@@ -334,7 +334,6 @@ textarea{resize:vertical;min-height:90px;margin-top:8px;}
 <div class="nav">
   <button class="nav-btn on" id="n-analyzer" onclick="goTo('analyzer')">Analyser</button>
   <button class="nav-btn" id="n-history" onclick="goTo('history')">Historique<span class="nav-badge" id="hBadge" style="display:none;"></span></button>
-  <button class="nav-btn" id="n-chat" onclick="goTo('chat')">Chat IA</button>
 </div>
 
 <!-- ANALYZER -->
@@ -461,15 +460,6 @@ textarea{resize:vertical;min-height:90px;margin-top:8px;}
   <div id="histList"><div class="empty"><div class="empty-ico">📋</div>Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici.</div></div>
 </div>
 
-<!-- CHAT section (kept for nav compatibility) -->
-<div class="content" id="s-chat" style="display:none;">
-  <div style="text-align:center;padding:48px 16px;color:var(--t2);font-size:13px;">
-    <div style="font-size:32px;margin-bottom:12px;">💬</div>
-    Le chatbot est disponible sur toutes les pages.<br>
-    <span style="color:var(--t3);font-size:12px;">Cliquez sur le bouton vert en bas à droite.</span>
-  </div>
-</div>
-
 <!-- CHATBOT FAB -->
 <button class="chat-fab" id="chatFab" onclick="toggleChatbot()" title="Chat IA — Posez vos questions">
   💬
@@ -550,7 +540,7 @@ async function callAPI(body){
 
 // Nav
 function goTo(s){
-  ['analyzer','history','chat'].forEach(x=>{
+  ['analyzer','history'].forEach(x=>{
     document.getElementById('s-'+x).style.display=x===s?'block':'none';
     document.getElementById('n-'+x).classList.toggle('on',x===s);
   });
