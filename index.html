@@ -961,13 +961,13 @@ async function cbotSend(){
   cbotAddMsg(msg,'user');cbotHistory.push({role:'user',content:msg});
   // Show typing indicator
   const tid='typ'+Date.now();cbotShowTyping(tid);
-  document.getElementById('cbotStatus').textContent="En train d'\u00e9crire...";
+  document.getElementById('cbotStatus').textContent="En train d'écrire...";
   const ctx=results.length?results.map(f=>`${f.titre||f.adresse}|Prix:${f.prix}$|MRB:${f.mrb||'?'}|CF:${f.cashflow_mensuel!=null?f.cashflow_mensuel+'$/m':'?'}|Score:${f.score_mega_deal}/10|Offre:${f.prix_offre_suggere||'?'}$`).join('\n'):'Aucune propriété analysée dans cette session.';
   try{
     const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:600,system:`Tu es Herbie IA, expert en investissement immobilier au Québec. Tu réponds de façon concise, chiffrée et pratique.\n\nPropriétés analysées:\n${ctx}\n\nTaux utilisé: ${customTaux}%, amortissement: ${customAmort} ans\nSCHL: 5%≤500k | 5%+10% tranche 500k-999k | 20%≥1M$\nPrime SCHL: 4% si MDF<10% | 3.1% si 10-15% | 2.8% si 15-20%`,messages:cbotHistory.slice(-12)});
     const rep=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
     document.getElementById(tid)?.remove();
-    cbotAddMsg(rep||'Désolé, je n'ai pas pu répondre.','agent');
+    cbotAddMsg(rep||"Désolé, je n'ai pas pu répondre",'agent');
     cbotHistory.push({role:'assistant',content:rep});
     document.getElementById('cbotStatus').textContent='Expert immobilier Québec';
   }catch(e){
