@@ -220,6 +220,77 @@ textarea{resize:vertical;min-height:90px;margin-top:8px;}
 .api-err{font-size:12px;color:var(--red);margin-bottom:8px;display:none;}
 .api-note{font-size:11px;color:var(--t3);line-height:1.6;}
 
+/* ÉTAT DE RÉSULTAT */
+.er-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-top:0;}
+.er-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--bg);cursor:pointer;user-select:none;border-bottom:1px solid var(--border);}
+.er-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.04em;}
+.er-arrow{font-size:11px;color:var(--t3);transition:transform .2s;}
+.er-arrow.open{transform:rotate(180deg);}
+.er-body{display:none;padding:14px;}
+.er-body.open{display:block;}
+.er-section{margin-bottom:14px;}
+.er-section:last-child{margin-bottom:0;}
+.er-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:6px;}
+.er-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;}
+.er-row.indent{padding-left:12px;color:var(--t2);}
+.er-row.neg{color:var(--red);}
+.er-row.pos{color:var(--green);}
+.er-row.sub{color:var(--t3);font-style:italic;}
+.er-divider{border:none;border-top:1px solid var(--border2);margin:6px 0;}
+.er-total{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;padding:6px 0 2px;}
+.er-total.green{color:var(--green);}
+.er-total.red{color:var(--red);}
+.er-total.blue{color:var(--blue);}
+.er-note{font-size:10px;color:var(--t3);margin-top:10px;line-height:1.6;padding-top:8px;border-top:1px solid var(--border);}
+
+/* CHATBOT */
+.chat-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;background:var(--green);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(22,101,52,0.4);z-index:90;transition:transform .2s,box-shadow .2s;font-size:22px;}
+.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(22,101,52,0.5);}
+.chat-fab-badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:#ef4444;border-radius:50%;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;display:none;}
+
+.chatbot-window{position:fixed;bottom:88px;right:24px;width:360px;max-height:520px;background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:90;display:none;flex-direction:column;overflow:hidden;animation:chatPop .2s ease;}
+@keyframes chatPop{from{opacity:0;transform:scale(.95) translateY(8px);}to{opacity:1;transform:none;}}
+.chatbot-window.open{display:flex;}
+@media(max-width:420px){.chatbot-window{width:calc(100vw - 32px);right:16px;bottom:80px;}}
+
+.cbot-header{background:var(--green);padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.cbot-avatar{width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.cbot-info{flex:1;}
+.cbot-name{font-size:14px;font-weight:700;color:#fff;}
+.cbot-status{font-size:11px;color:rgba(255,255,255,0.75);}
+.cbot-close{background:none;border:none;color:rgba(255,255,255,0.8);font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;}
+.cbot-close:hover{color:#fff;}
+
+.cbot-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:340px;}
+.cbot-empty{text-align:center;padding:20px 12px;color:var(--t3);font-size:12px;line-height:1.7;}
+.cbot-empty-ico{font-size:28px;margin-bottom:6px;}
+
+.cbot-msg-row{display:flex;align-items:flex-end;gap:8px;}
+.cbot-msg-row.user{flex-direction:row-reverse;}
+.cbot-msg-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--green-bg);}
+.cbot-msg-row.user .cbot-msg-avatar{background:var(--blue-bg);}
+.cbot-bubble{max-width:80%;padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.55;}
+.cbot-msg-row.agent .cbot-bubble{background:var(--bg);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--t1);}
+.cbot-msg-row.user .cbot-bubble{background:var(--green);color:#fff;border-bottom-right-radius:4px;}
+.cbot-msg-row.agent.thinking .cbot-bubble{color:var(--t3);font-style:italic;}
+
+.cbot-typing{display:flex;gap:4px;padding:10px 13px;}
+.cbot-typing span{width:7px;height:7px;background:var(--t3);border-radius:50%;animation:bounce 1.2s infinite;}
+.cbot-typing span:nth-child(2){animation-delay:.2s;}
+.cbot-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+.cbot-suggs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;border-top:1px solid var(--border);}
+.cbot-sugg{background:none;border:1px solid var(--border2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:'Inter',sans-serif;}
+.cbot-sugg:hover{border-color:var(--green);color:var(--green);}
+
+.cbot-input{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);}
+.cbot-input input{flex:1;padding:8px 12px;border:1px solid var(--border2);border-radius:20px;font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+.cbot-input input:focus{border-color:var(--green);}
+.cbot-send{width:34px;height:34px;background:var(--green);color:#fff;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cbot-send:hover{background:#14532d;}
+.cbot-send svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;}
+
 /* SPINNER */
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -271,13 +342,34 @@ textarea{resize:vertical;min-height:90px;margin-top:8px;}
 
   <!-- Params -->
   <div class="card">
+    <!-- Rate cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);">
+      <div style="background:var(--bg);border-radius:var(--r2);padding:12px;text-align:center;border:1px solid var(--border);">
+        <div style="font-size:22px;margin-bottom:4px;">📈</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px;">Variable 5 ans</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green);" id="rateVar">—</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px;" id="rateVarSrc">Chargement...</div>
+      </div>
+      <div style="background:var(--bg);border-radius:var(--r2);padding:12px;text-align:center;border:1px solid var(--border);">
+        <div style="font-size:22px;margin-bottom:4px;">🔒</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px;">Fixe 3 ans · 25 ans</div>
+        <div style="font-size:20px;font-weight:800;color:var(--blue);" id="rateFix3">—</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px;" id="rateFix3Src">Chargement...</div>
+      </div>
+      <div style="background:var(--bg);border-radius:var(--r2);padding:12px;text-align:center;border:1px solid var(--border);">
+        <div style="font-size:22px;margin-bottom:4px;">🏦</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:4px;">Fixe 5 ans · 25 ans</div>
+        <div style="font-size:20px;font-weight:800;color:var(--amber);" id="rateFix5">—</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px;" id="rateFix5Src">Chargement...</div>
+      </div>
+    </div>
+    <!-- Params toggle -->
     <div class="params-toggle" onclick="toggleP()">
       <div class="params-toggle-left">
         <h3>Paramètres de calcul</h3>
         <div class="params-pills">
           <span class="pill" id="pTaux">3.35%</span>
           <span class="pill" id="pAmort">25 ans</span>
-          <span class="pill" id="pVar" style="background:var(--blue-bg);color:var(--blue);">—</span>
         </div>
       </div>
       <span class="params-arrow" id="pArrow">▼</span>
@@ -369,22 +461,49 @@ textarea{resize:vertical;min-height:90px;margin-top:8px;}
   <div id="histList"><div class="empty"><div class="empty-ico">📋</div>Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici.</div></div>
 </div>
 
-<!-- CHAT -->
+<!-- CHAT section (kept for nav compatibility) -->
 <div class="content" id="s-chat" style="display:none;">
-  <div class="chat-wrap">
-    <div class="chat-msgs" id="chatMsgs">
-      <div class="chat-empty">💬 Posez des questions sur vos fiches analysées.<br><span style="font-size:12px;">Calculs, comparaisons, négociation, zonage...</span></div>
+  <div style="text-align:center;padding:48px 16px;color:var(--t2);font-size:13px;">
+    <div style="font-size:32px;margin-bottom:12px;">💬</div>
+    Le chatbot est disponible sur toutes les pages.<br>
+    <span style="color:var(--t3);font-size:12px;">Cliquez sur le bouton vert en bas à droite.</span>
+  </div>
+</div>
+
+<!-- CHATBOT FAB -->
+<button class="chat-fab" id="chatFab" onclick="toggleChatbot()" title="Chat IA — Posez vos questions">
+  💬
+  <div class="chat-fab-badge" id="chatFabBadge">1</div>
+</button>
+
+<!-- CHATBOT WINDOW -->
+<div class="chatbot-window" id="chatbotWindow">
+  <div class="cbot-header">
+    <div class="cbot-avatar">🏢</div>
+    <div class="cbot-info">
+      <div class="cbot-name">Herbie IA</div>
+      <div class="cbot-status" id="cbotStatus">Expert immobilier Québec</div>
     </div>
-    <div class="chat-suggs" id="chatSuggs">
-      <button class="sugg" onclick="qSugg(this)">Quel est le meilleur deal?</button>
-      <button class="sugg" onclick="qSugg(this)">Si je négocie -10%, quel cashflow?</button>
-      <button class="sugg" onclick="qSugg(this)">Explique le MRB simplement</button>
-      <button class="sugg" onclick="qSugg(this)">Quels risques vérifier?</button>
+    <button class="cbot-close" onclick="toggleChatbot()">✕</button>
+  </div>
+  <div class="cbot-msgs" id="cbotMsgs">
+    <div class="cbot-empty">
+      <div class="cbot-empty-ico">👋</div>
+      Bonjour! Je suis Herbie IA.<br>
+      Posez-moi vos questions sur vos fiches ou sur l'immobilier au Québec.
     </div>
-    <div class="chat-bar">
-      <input type="text" id="chatIn" placeholder="Ex: Si j'offre 650k$, quel serait le cashflow?" onkeydown="if(event.key==='Enter')sendChat()"/>
-      <button class="chat-send" onclick="sendChat()">Envoyer</button>
-    </div>
+  </div>
+  <div class="cbot-suggs" id="cbotSuggs">
+    <button class="cbot-sugg" onclick="cbotSugg(this)">Meilleur deal analysé?</button>
+    <button class="cbot-sugg" onclick="cbotSugg(this)">Si je négocie -10%?</button>
+    <button class="cbot-sugg" onclick="cbotSugg(this)">Explique le MRB</button>
+    <button class="cbot-sugg" onclick="cbotSugg(this)">Risques à vérifier?</button>
+  </div>
+  <div class="cbot-input">
+    <input type="text" id="cbotIn" placeholder="Posez votre question..." onkeydown="if(event.key==='Enter')cbotSend()"/>
+    <button class="cbot-send" onclick="cbotSend()">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
 </div>
 
@@ -454,16 +573,48 @@ const RK='hh_r8';
 async function loadRates(){
   try{const c=sessionStorage.getItem(RK);if(c){const p=JSON.parse(c);if(Date.now()-p.ts<3600000){applyR(p.d);return p.d;}}}catch(e){}
   try{
-    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:200,system:'Taux hypothécaires Québec. JSON uniquement: {"variable":"3.35%","fixe":"3.94%","source":"ratehub.ca","vn":3.35,"fn":3.94}',messages:[{role:'user',content:"Meilleurs taux variable et fixe 5 ans Québec aujourd'hui."}],tools:[{type:'web_search_20250305',name:'web_search'}]});
+    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:200,system:'Taux hypothécaires Québec mars 2026. JSON uniquement, pas de texte: {"variable":"3.35%","fixe3":"3.59%","fixe":"3.94%","source":"ratehub.ca","vn":3.35,"f3n":3.59,"fn":3.94}',messages:[{role:'user',content:"Meilleurs taux hypothécaires Québec aujourd\'hui: variable 5 ans, fixe 3 ans 25 ans, fixe 5 ans 25 ans."}],tools:[{type:'web_search_20250305',name:'web_search'}]});
     const t=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const r=parseJ(t)||{variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};
+    const r=parseJ(t)||{variable:'3.35%',fixe3:'3.59%',fixe:'3.94%',source:'Estimation',vn:3.35,f3n:3.59,fn:3.94};
     sessionStorage.setItem(RK,JSON.stringify({ts:Date.now(),d:r}));
     applyR(r);return r;
-  }catch(e){const r={variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};applyR(r);return r;}
+  }catch(e){const r={variable:'3.35%',fixe3:'3.59%',fixe:'3.94%',source:'Estimation',vn:3.35,f3n:3.59,fn:3.94};applyR(r);return r;}
 }
 function applyR(r){
   rateData=r;
-  document.getElementById('pVar').textContent='Var '+r.variable+' · Fix '+r.fixe;
+  const src=r.source||'ratehub.ca';
+  const today=new Date().toLocaleDateString('fr-CA',{day:'numeric',month:'short'});
+
+  // Rate trend arrow vs yesterday
+  let arrow='',arrowColor='var(--t3)';
+  try{
+    const RK_PREV='hh_rate_prev';
+    const todayStr=new Date().toDateString();
+    const prev=JSON.parse(localStorage.getItem(RK_PREV)||'null');
+    if(!prev){localStorage.setItem(RK_PREV,JSON.stringify({date:todayStr,vn:r.vn,fn:r.fn}));}
+    else if(prev.date!==todayStr){localStorage.setItem(RK_PREV,JSON.stringify({date:todayStr,vn:r.vn,fn:r.fn}));}
+    else if(prev.vn!==undefined){
+      if(r.vn<prev.vn){arrow=' ↓';arrowColor='var(--green)';}
+      else if(r.vn>prev.vn){arrow=' ↑';arrowColor='var(--red)';}
+      else{arrow=' →';arrowColor='var(--t3)';}
+    }
+  }catch(e){}
+
+  const pill=document.getElementById('pVar');
+  if(pill){pill.innerHTML='Var <span style="color:'+arrowColor+';font-weight:700;">'+r.variable+arrow+'</span> · Fix '+r.fixe;}
+
+  if(document.getElementById('rateVar')){
+    document.getElementById('rateVar').textContent=r.variable||'3.35%';
+    document.getElementById('rateVarSrc').textContent=src+' · '+today;
+  }
+  if(document.getElementById('rateFix3')){
+    document.getElementById('rateFix3').textContent=r.fixe3||'3.59%';
+    document.getElementById('rateFix3Src').textContent=src+' · '+today;
+  }
+  if(document.getElementById('rateFix5')){
+    document.getElementById('rateFix5').textContent=r.fixe||'3.94%';
+    document.getElementById('rateFix5Src').textContent=src+' · '+today;
+  }
   if(r.vn&&!document.getElementById('tSlider')._set){document.getElementById('tSlider').value=r.vn;document.getElementById('tSlider')._set=true;updateP();}
 }
 
@@ -521,6 +672,19 @@ function removeItem(i){items.splice(i,1);renderItems();updBtn();}
 function renderItems(){
   const l=document.getElementById('itemList');if(!items.length){l.innerHTML='';return;}
   const ic={url:'🔗',text:'📋',pdf:'📄',pdf_text:'📄',image:'📸'};
+function propIcon(type,titre){
+  if(!type&&!titre)return'🏢';
+  const t=(type||'').toLowerCase()+(titre||'').toLowerCase();
+  if(t.includes('duplex'))return'🏘️';
+  if(t.includes('triplex'))return'🏘️';
+  if(t.includes('quadruplex')||t.includes('4-plex')||t.includes('4plex'))return'🏘️';
+  if(t.includes('multiplex')||t.includes('plex')||t.includes('logement'))return'🏢';
+  if(t.includes('unifamilial')||t.includes('maison'))return'🏠';
+  if(t.includes('condo')||t.includes('studio'))return'🏙️';
+  if(t.includes('commercial')||t.includes('bureau'))return'🏗️';
+  if(t.includes('terrain'))return'🌿';
+  return'🏢';
+}
   l.innerHTML=items.map((it,i)=>`<div class="item"><span>${ic[it.type]||'📎'} ${it.label}</span><button onclick="removeItem(${i})">✕</button></div>`).join('');
 }
 function updBtn(){document.getElementById('analyzeBtn').disabled=items.length===0;}
@@ -539,7 +703,7 @@ SCORE/10: MRB≤8:+3|MRB≤10:+2|Cashflow+:+3|Cashflow>-300:+1|Prix<marché:+2|S
 RECHERCHES: 1) Zonage municipal 2) Ventes comparables récentes.
 
 JSON UNIQUEMENT (pas de texte avant ou après):
-{"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"prime_schl":0,"prime_schl_pct":0,"pret_total":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","logements_max_permis":0,"score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
+{"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"taxes_municipales":0,"taxes_scolaires":0,"assurances":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"prime_schl":0,"prime_schl_pct":0,"pret_total":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","logements_max_permis":0,"score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
 
 async function analyzeFiche(item,rate){
   const taux=customTaux||rate.vn||3.35;
@@ -593,16 +757,122 @@ function fmt(n){return n?n.toLocaleString('fr-CA')+'\u202f$':'N/A';}
 function fmtK(n){return n?(n/1000).toFixed(0)+'k\u202f$':'N/A';}
 function setP(p,l){document.getElementById('pFill').style.width=p+'%';document.getElementById('stepTxt').textContent=l||'';}
 
+function renderER(f){
+  if(!f.prix||!f.revenus_bruts_annuels)return'';
+
+  const rev = f.revenus_bruts_annuels;
+  const inoc = Math.round(rev * 0.05); // 5% vacancy
+  const revEffectif = rev - inoc;
+
+  // Taxes — split mun/sco if available, else estimate
+  const taxTotal = f.taxes_annuelles || Math.round(f.prix * 0.01);
+  const taxMun = f.taxes_municipales || Math.round(taxTotal * 0.85);
+  const taxSco = f.taxes_scolaires || Math.round(taxTotal * 0.15);
+
+  // Expenses
+  const assurances = f.assurances || Math.round(rev * 0.035); // ~3.5% revenus
+  const entretien = Math.round(rev * 0.05); // 5% revenus
+  const gestion = f.gestion || 0;
+  const totalDep = taxMun + taxSco + assurances + entretien + gestion;
+
+  // NOI
+  const rne = revEffectif - totalDep;
+
+  // Mortgage
+  const versAnnuel = f.versement_mensuel ? f.versement_mensuel * 12 : 0;
+
+  // Cashflow
+  const cf = rne - versAnnuel;
+  const cfMois = Math.round(cf / 12);
+
+  const fmtR = n => (n >= 0 ? '' : '-') + Math.abs(n).toLocaleString('fr-CA') + ' $';
+  const fmtN = n => (n > 0 ? '+' : '') + n.toLocaleString('fr-CA') + ' $';
+
+  const erId = 'er_' + Math.random().toString(36).slice(2);
+
+  return `<div class="er-wrap">
+    <div class="er-header" onclick="toggleER('${erId}')">
+      <div class="er-header-left">📊 État de résultat sommaire</div>
+      <span class="er-arrow" id="arr_${erId}">▼</span>
+    </div>
+    <div class="er-body" id="${erId}">
+      <div class="er-section">
+        <div class="er-section-title">Revenus</div>
+        <div class="er-row indent">Loyers bruts annuels <span>${fmtR(rev)}</span></div>
+        <div class="er-row indent neg">Inoccupation estimée (5%) <span>-${fmtR(inoc)}</span></div>
+        <hr class="er-divider"/>
+        <div class="er-total blue">Revenus effectifs <span>${fmtR(revEffectif)}</span></div>
+      </div>
+      <div class="er-section">
+        <div class="er-section-title">Dépenses d'exploitation</div>
+        <div class="er-row indent">Taxes municipales <span>-${fmtR(taxMun)}</span></div>
+        <div class="er-row indent">Taxes scolaires <span>-${fmtR(taxSco)}</span></div>
+        <div class="er-row indent">Assurances${f.assurances?'':' (estimées)'} <span>-${fmtR(assurances)}</span></div>
+        <div class="er-row indent">Entretien &amp; réparations (5%) <span>-${fmtR(entretien)}</span></div>
+        ${gestion>0?`<div class="er-row indent">Gestion locative <span>-${fmtR(gestion)}</span></div>`:''}
+        <hr class="er-divider"/>
+        <div class="er-total red">Total dépenses <span>-${fmtR(totalDep)}</span></div>
+      </div>
+      <div class="er-section">
+        <div class="er-total ${rne>0?'green':'red'}" style="font-size:14px;border-top:2px solid var(--border2);padding-top:8px;">
+          Résultat net d'exploitation (RNE) <span>${fmtN(rne)}</span>
+        </div>
+        <div class="er-row sub" style="margin-top:2px;">Taux de cap. estimé <span>${f.prix?((rne/f.prix)*100).toFixed(2)+'%':'N/A'}</span></div>
+      </div>
+      ${versAnnuel>0?`<div class="er-section">
+        <div class="er-section-title">Service de la dette</div>
+        <div class="er-row indent neg">Versement hypothécaire annuel <span>-${fmtR(versAnnuel)}</span></div>
+        <hr class="er-divider"/>
+        <div class="er-total ${cf>0?'green':'red'}" style="font-size:14px;border-top:2px solid var(--border2);padding-top:8px;">
+          Cashflow net annuel <span>${fmtN(cf)}</span>
+        </div>
+        <div class="er-row ${cfMois>0?'pos':'neg'}" style="font-size:13px;font-weight:600;padding:3px 0;">
+          Cashflow mensuel <span>${fmtN(cfMois)}/mois</span>
+        </div>
+      </div>`:''}
+      <div class="er-note">
+        * Inoccupation 5%, entretien 5% des revenus. Assurances estimées à 3,5% des revenus si non fournies.
+        Taxes scolaires estimées à 15% des taxes totales si non fournies séparément.
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleER(id){
+  const b=document.getElementById(id);
+  const a=document.getElementById('arr_'+id);
+  b.classList.toggle('open');
+  a.classList.toggle('open');
+}
+
 function renderCard(f){
   const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel;
   const isMega=sc>=7,isBad=sc<=3;
   const cfStr=cf!=null?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'N/A';
   const cfCls=cf>0?'g':cf<0?'r':'a';
   const ecart=f.eval_municipale&&f.prix?Math.round((f.prix-f.eval_municipale)/f.eval_municipale*100):null;
-  const sColor=isMega?'var(--green)':isBad?'var(--red)':'var(--amber)';
-  const sBg=isMega?'var(--green-bg)':isBad?'var(--red-bg)':'var(--amber-bg)';
-  const badge=isMega?`<div class="res-badge mega">★ Méga deal</div>`:isBad?`<div class="res-badge bad">⚠ Deal à éviter</div>`:'';
+  const sColor=sc>=7?'var(--green)':sc>=5?'var(--amber)':sc>=3?'#f97316':'var(--red)';
+  const sBg=sc>=7?'var(--green-bg)':sc>=5?'var(--amber-bg)':sc>=3?'#fff7ed':'var(--red-bg)';
+  // Dynamic score icon
+function scoreIcon(sc){
+  if(sc>=9)return'🔥';
+  if(sc>=7)return'⭐';
+  if(sc>=5)return'👍';
+  if(sc>=3)return'⚠️';
+  return'❌';
+}
+// Market weather based on MRB + cashflow
+function marketWeather(f){
+  const mrb=f.mrb||99,cf=f.cashflow_mensuel||0;
+  if(mrb<=8&&cf>500)return{icon:'🔥',label:'Marché chaud',color:'var(--red)'};
+  if(mrb<=10&&cf>0)return{icon:'☀️',label:'Bon marché',color:'var(--amber)'};
+  if(mrb<=12&&cf>-300)return{icon:'🌤️',label:'Marché tiède',color:'var(--t2)'};
+  return{icon:'❄️',label:'Marché froid',color:'var(--blue)'};
+}
+const badge=isMega?`<div class="res-badge mega">${scoreIcon(sc)} Méga deal</div>`:isBad?`<div class="res-badge bad">⚠️ Deal à éviter</div>`:(sc>=5?`<div class="res-badge" style="background:var(--amber-bg);color:var(--amber);">${scoreIcon(sc)} Deal potentiel</div>`:'');
   const zone=f.zonage_code?`<div class="res-zone">📍 ${f.zonage_code}${f.logements_max_permis?` · max ${f.logements_max_permis} log.`:''}</div>`:'';
+  const weather=marketWeather(f);
+  const weatherHtml=`<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:${weather.color};margin-top:4px;">${weather.icon} ${weather.label}</span>`;
   const risques=(f.risques||[]).map(r=>`<div class="list-item"><span class="li-icon" style="color:var(--red)">⚠</span><span>${r}</span></div>`).join('');
   const nego=(f.points_negociation||[]).map(n=>`<div class="list-item"><span class="li-icon" style="color:var(--amber)">→</span><span>${n}</span></div>`).join('');
   const chars=(f.caracteristiques||[]).slice(0,8).map(c=>`<span class="tag neutral">${c}</span>`).join('');
@@ -610,9 +880,10 @@ function renderCard(f){
   <div class="res-head">
     <div class="res-hl">
       ${badge}
-      <div class="res-title">${f.titre||'Propriété analysée'}</div>
+      <div class="res-title">${propIcon(f.type,f.titre)} ${f.titre||'Propriété analysée'}</div>
       <div class="res-addr">${[f.adresse,f.ville,f.type,f.nb_logements?f.nb_logements+' log.':'',f.annee_construction?f.annee_construction+'':''].filter(Boolean).join(' · ')}</div>
       ${zone}
+      ${weatherHtml}
     </div>
     <div class="score-ring" style="border-color:${sColor};background:${sBg};">
       <span class="score-n" style="color:${sColor};">${sc}</span>
@@ -651,6 +922,9 @@ function renderCard(f){
     ${nego?`<div class="sec full"><div class="sec-t">Points à négocier</div>${nego}</div>`:''}
   </div>
   ${f.verdict?`<div class="verdict"><strong>Verdict :</strong> ${f.verdict}</div>`:''}
+  <div style="padding:12px 16px;border-top:1px solid var(--border);">${renderER(f)}</div>
+</div>`;
+}{f.verdict}</div>`:''}
 </div>`;
 }
 
@@ -666,30 +940,63 @@ function renderHist(){
   const td=new Date().toDateString(),yd=new Date(Date.now()-86400000).toDateString();
   const g={};h.forEach(f=>{const d=new Date(f._at).toDateString();const k=d===td?"Aujourd'hui":d===yd?'Hier':new Date(f._at).toLocaleDateString('fr-CA',{day:'numeric',month:'long'});if(!g[k])g[k]=[];g[k].push(f);});
   l.innerHTML=Object.entries(g).map(([date,items])=>`<div class="hist-group">${date}</div>${items.map(f=>{const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel,col=sc>=7?'var(--green)':sc>=5?'var(--amber)':'var(--red)';const cfS=cf!=null?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'';return`<div class="hi${sc>=7?' mega':sc<=3?' bad':''}" onclick='showHistDetail(${JSON.stringify(f).replace(/'/g,"&#39;")})'>
-    <div><div class="hi-title">${f.titre||f.adresse||'Propriété'}</div><div class="hi-meta">${[f.ville,f.type,f.prix?(f.prix/1000).toFixed(0)+'k\u202f$':'',cfS].filter(Boolean).join(' · ')}</div></div>
+    <div><div class="hi-title">${propIcon(f.type,f.titre)} ${f.titre||f.adresse||'Propriété'}</div><div class="hi-meta">${[f.ville,f.type,f.prix?(f.prix/1000).toFixed(0)+'k\u202f$':'',cfS].filter(Boolean).join(' · ')}</div></div>
     <div class="hi-score" style="color:${col}">${sc}/10</div>
   </div>`}).join('')}`).join('');
 }
 function showHistDetail(f){goTo('analyzer');document.getElementById('results').innerHTML=renderCard(f);document.getElementById('results').scrollIntoView({behavior:'smooth'});}
 
-// Chat
-function qSugg(b){document.getElementById('chatIn').value=b.textContent;document.getElementById('chatSuggs').style.display='none';sendChat();}
-async function sendChat(){
-  const inp=document.getElementById('chatIn');const msg=inp.value.trim();if(!msg)return;inp.value='';
-  addMsg(msg,'u');chatHistory.push({role:'user',content:msg});
-  const tid='t'+Date.now();addMsg('...','a',tid,true);
-  const ctx=results.length?results.map(f=>`${f.titre||f.adresse}|Prix:${f.prix}$|MRB:${f.mrb||'?'}|CF:${f.cashflow_mensuel!=null?f.cashflow_mensuel+'$/m':'?'}|Score:${f.score_mega_deal}/10`).join('\n'):'Aucune propriété.';
+// Chatbot
+let cbotHistory=[];
+function toggleChatbot(){
+  const w=document.getElementById('chatbotWindow');
+  const isOpen=w.classList.contains('open');
+  w.classList.toggle('open');
+  // Hide badge when opened
+  if(!isOpen){document.getElementById('chatFabBadge').style.display='none';}
+  // Focus input when opened
+  if(!isOpen)setTimeout(()=>document.getElementById('cbotIn')?.focus(),200);
+}
+function cbotSugg(b){document.getElementById('cbotIn').value=b.textContent;document.getElementById('cbotSuggs').style.display='none';cbotSend();}
+async function cbotSend(){
+  const inp=document.getElementById('cbotIn');const msg=inp.value.trim();if(!msg)return;inp.value='';
+  cbotAddMsg(msg,'user');cbotHistory.push({role:'user',content:msg});
+  // Show typing indicator
+  const tid='typ'+Date.now();cbotShowTyping(tid);
+  document.getElementById('cbotStatus').textContent='En train d'écrire...';
+  const ctx=results.length?results.map(f=>`${f.titre||f.adresse}|Prix:${f.prix}$|MRB:${f.mrb||'?'}|CF:${f.cashflow_mensuel!=null?f.cashflow_mensuel+'$/m':'?'}|Score:${f.score_mega_deal}/10|Offre:${f.prix_offre_suggere||'?'}$`).join('\n'):'Aucune propriété analysée dans cette session.';
   try{
-    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:600,system:`Expert immobilier Québec. Concis et chiffré.\nPropriétés: ${ctx}\nTaux: ${customTaux}%, amort: ${customAmort} ans\nSCHL: 5%≤500k, 5%+10% 500k-999k, 20%≥1M$. Prime: 4%/<10%, 3.1%/10-15%, 2.8%/15-20%.`,messages:chatHistory.slice(-10)});
+    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:600,system:`Tu es Herbie IA, expert en investissement immobilier au Québec. Tu réponds de façon concise, chiffrée et pratique.\n\nPropriétés analysées:\n${ctx}\n\nTaux utilisé: ${customTaux}%, amortissement: ${customAmort} ans\nSCHL: 5%≤500k | 5%+10% tranche 500k-999k | 20%≥1M$\nPrime SCHL: 4% si MDF<10% | 3.1% si 10-15% | 2.8% si 15-20%`,messages:cbotHistory.slice(-12)});
     const rep=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    document.getElementById(tid)?.remove();addMsg(rep||'Pas de réponse.','a');chatHistory.push({role:'assistant',content:rep});
-  }catch(e){document.getElementById(tid)?.remove();addMsg('Erreur: '+e.message,'a');}
+    document.getElementById(tid)?.remove();
+    cbotAddMsg(rep||'Désolé, je n'ai pas pu répondre.','agent');
+    cbotHistory.push({role:'assistant',content:rep});
+    document.getElementById('cbotStatus').textContent='Expert immobilier Québec';
+  }catch(e){
+    document.getElementById(tid)?.remove();
+    cbotAddMsg('Erreur: '+e.message,'agent');
+    document.getElementById('cbotStatus').textContent='Expert immobilier Québec';
+  }
 }
-function addMsg(txt,type,id,thinking){
-  const m=document.getElementById('chatMsgs');m.querySelector('.chat-empty')?.remove();
-  const d=document.createElement('div');d.className=type==='u'?'msg-u':('msg-a'+(thinking?' thinking':''));
-  if(id)d.id=id;d.innerHTML=txt.replace(/\n/g,'<br>');m.appendChild(d);m.scrollTop=m.scrollHeight;
+function cbotAddMsg(txt,type,id){
+  const msgs=document.getElementById('cbotMsgs');
+  msgs.querySelector('.cbot-empty')?.remove();
+  const row=document.createElement('div');
+  row.className='cbot-msg-row '+type;
+  if(id)row.id=id;
+  const avatarEmoji=type==='user'?'👤':'🏢';
+  row.innerHTML=`<div class="cbot-msg-avatar">${avatarEmoji}</div><div class="cbot-bubble">${txt.replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
 }
+function cbotShowTyping(id){
+  const msgs=document.getElementById('cbotMsgs');
+  const row=document.createElement('div');row.className='cbot-msg-row agent';row.id=id;
+  row.innerHTML=`<div class="cbot-msg-avatar">🏢</div><div class="cbot-bubble"><div class="cbot-typing"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+}
+// Legacy compat
+function qSugg(b){cbotSugg(b);}
+function sendChat(){cbotSend();}
 </script>
 </body>
 </html>
