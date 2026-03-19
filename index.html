@@ -373,15 +373,38 @@ function offDrag(id){document.getElementById(id).classList.remove('drag-over');}
 function onDrop(e,kind){e.preventDefault();offDrag(kind==='pdf'?'pdfDrop':'imgDrop');handleFiles([...e.dataTransfer.files],kind);}
 function onFileChange(e,kind){handleFiles([...e.target.files],kind);e.target.value='';}
 
+function compressImage(dataUrl, maxWidth, quality, callback) {
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    let w = img.width, h = img.height;
+    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    const compressed = canvas.toDataURL('image/jpeg', quality);
+    callback(compressed.split(',')[1]);
+  };
+  img.src = dataUrl;
+}
+
 function handleFiles(files, kind) {
   files.forEach(file => {
     const isPdf = kind==='pdf'||file.type==='application/pdf';
     const reader = new FileReader();
     reader.onload = ev => {
-      const base64 = ev.target.result.split(',')[1];
+      const dataUrl = ev.target.result;
       const mediaType = file.type||(isPdf?'application/pdf':'image/jpeg');
-      items.push({type:isPdf?'pdf':'image',label:file.name,base64,mediaType});
-      renderItems(); updateBtn();
+      if (!isPdf) {
+        // Compress image to max 1200px wide, 70% quality → ~50-80k chars base64
+        compressImage(dataUrl, 1200, 0.70, base64 => {
+          items.push({type:'image', label:file.name, base64, mediaType:'image/jpeg'});
+          renderItems(); updateBtn();
+        });
+      } else {
+        const base64 = dataUrl.split(',')[1];
+        items.push({type:'pdf', label:file.name, base64, mediaType});
+        renderItems(); updateBtn();
+      }
     };
     reader.readAsDataURL(file);
     // Preview
