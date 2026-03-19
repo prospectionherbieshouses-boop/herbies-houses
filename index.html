@@ -606,7 +606,20 @@ async function analyzeAll(){
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
-function parseJ(t){try{return JSON.parse((t||'').replace(/```json|```/g,'').trim());}catch(e){return null;}}
+function parseJ(t){
+  if(!t)return null;
+  // Remove markdown code blocks
+  let s = t.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  // Try direct parse first
+  try{return JSON.parse(s);}catch(e){}
+  // Try to extract JSON object from text
+  const start = s.indexOf('{');
+  const end = s.lastIndexOf('}');
+  if(start>=0 && end>start){
+    try{return JSON.parse(s.slice(start, end+1));}catch(e){}
+  }
+  return null;
+}
 function fmt(n){return n?n.toLocaleString('fr-CA')+'\u202f$':'N/A';}
 function fmtK(n){return n?(n/1000).toFixed(0)+'k\u202f$':'N/A';}
 function setProgress(pct,lbl){document.getElementById('pBar').style.width=pct+'%';document.getElementById('stepLbl').textContent=lbl||'';}
