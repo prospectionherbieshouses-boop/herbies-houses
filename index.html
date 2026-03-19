@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Index</title>
+<title>Analyseur de fiches immobilières — Herbie's Houses</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -20,6 +20,34 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;padding:2rem 1.5rem;}
 
+/* API KEY MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.hidden{display:none;}
+.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:2rem;max-width:480px;width:100%;}
+.modal-icon{width:48px;height:48px;border-radius:var(--r);background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;}
+.modal-icon svg{width:24px;height:24px;stroke:#0f0f0e;fill:none;stroke-width:1.8;}
+.modal h2{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;margin-bottom:.5rem;}
+.modal p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:1.25rem;}
+.modal a{color:var(--accent);text-decoration:none;}
+.modal a:hover{text-decoration:underline;}
+.api-steps{background:var(--bg3);border-radius:var(--r2);padding:1rem;margin-bottom:1.25rem;}
+.api-step{display:flex;gap:10px;font-size:12px;color:var(--t2);margin-bottom:8px;line-height:1.5;}
+.api-step:last-child{margin-bottom:0;}
+.api-step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#0f0f0e;font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.api-input-row{display:flex;gap:8px;margin-bottom:.75rem;}
+.api-input-row input{flex:1;padding:10px 14px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;letter-spacing:.05em;}
+.api-input-row input:focus{border-color:var(--accent2);}
+.api-save-btn{padding:10px 20px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0f0f0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.api-note{font-size:11px;color:var(--t3);line-height:1.6;}
+.api-error{font-size:12px;color:var(--red);margin-top:8px;display:none;}
+
+/* API KEY BANNER */
+.api-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);padding:8px 14px;margin-bottom:1rem;flex-wrap:wrap;}
+.api-banner-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.api-banner button{font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;}
+.api-banner button:hover{color:var(--accent);}
+
 .masthead{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;}
 .masthead-icon{width:48px;height:48px;border-radius:var(--r);background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .masthead-icon svg{width:24px;height:24px;stroke:#0f0f0e;fill:none;stroke-width:1.8;}
@@ -32,26 +60,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .rpv{font-size:16px;font-weight:500;color:var(--accent);}
 .rps{font-size:10px;color:var(--t3);margin-top:1px;}
 
-/* ── Input card ── */
 .input-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem;}
-.input-card > label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:10px;}
-
+.input-card>label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:10px;}
 .tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
 .tab-btn{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px;}
 .tab-btn.active{background:rgba(212,168,83,0.15);color:var(--accent);border-color:var(--accent2);}
 .tab-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
-
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
-/* URL */
 .input-row{display:flex;gap:8px;}
 .input-row input{flex:1;padding:10px 14px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s;}
 .input-row input:focus{border-color:var(--accent2);}
 .input-row textarea{flex:1;padding:10px 14px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:90px;transition:border .15s;}
 .input-row textarea:focus{border-color:var(--accent2);}
 
-/* PDF / Image drop zone */
 .dropzone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:2rem 1rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
 .dropzone:hover,.dropzone.drag-over{border-color:var(--accent2);background:rgba(212,168,83,0.05);}
 .dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
@@ -60,25 +83,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .dz-sub{font-size:11px;color:var(--t3);}
 .dz-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .dz-preview{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);font-size:12px;color:var(--t2);}
-.dz-preview-thumb{width:36px;height:36px;border-radius:4px;object-fit:cover;background:var(--bg4);}
-.dz-preview-thumb.pdf-thumb{display:flex;align-items:center;justify-content:center;font-size:18px;}
+.dz-preview-thumb{width:36px;height:36px;border-radius:4px;object-fit:cover;}
+.dz-preview-thumb.pdf-thumb{display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg4);}
 .dz-preview button{background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;padding:0 2px;margin-left:4px;}
 .dz-preview button:hover{color:var(--red);}
 
 .add-btn{padding:10px 18px;border-radius:var(--r2);border:none;background:var(--accent);color:#0f0f0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity .15s;flex-shrink:0;}
 .add-btn:hover{opacity:.85;}
-.add-btn.secondary{background:var(--bg3);color:var(--t1);border:0.5px solid var(--border2);}
 
 .url-chips{display:flex;flex-direction:column;gap:5px;margin-top:10px;}
 .url-chip{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);font-size:12px;}
-.url-chip-icon{margin-right:6px;font-size:13px;}
 .url-chip span{color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88%;}
 .url-chip button{background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:0;flex-shrink:0;}
 .url-chip button:hover{color:var(--red);}
-
 .hint{font-size:11px;color:var(--t3);margin-top:10px;line-height:1.6;}
 
-/* Analyze */
 .analyze-wrap{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
 .analyze-btn{padding:11px 28px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0f0f0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Serif Display',serif;letter-spacing:.01em;transition:opacity .15s;}
 .analyze-btn:hover{opacity:.88;}
@@ -87,7 +106,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;transition:width .4s;width:0;}
 .step-lbl{font-size:11px;color:var(--t3);min-width:140px;text-align:right;}
 
-/* Report */
 .report{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem;animation:fadeUp .4s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
 .report.mega{border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;}
@@ -98,7 +116,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .mega-label{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 9px;border-radius:20px;background:var(--amber-bg);color:var(--accent);border:0.5px solid rgba(212,168,83,0.3);margin-bottom:6px;}
 .score-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
 .score-ring svg{width:52px;height:52px;transform:rotate(-90deg);}
-.score-ring-fill{stroke-dasharray:132;stroke-linecap:round;transition:stroke-dashoffset .6s ease;}
 .score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:500;line-height:1;text-align:center;}
 .score-denom{font-size:9px;color:var(--t3);}
 .report-body{padding:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
@@ -106,7 +123,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .section{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);padding:1rem;}
 .section.full{grid-column:1/-1;}
 .section-title{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-.section-title::after{content:'';flex:1;height:0.5px;background:var(--border);}
+.section-title::after{content:'';flex:1;height:.5px;background:var(--border);}
 .kv{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px;}
 .kv:last-child{border-bottom:none;}
 .kk{color:var(--t2);}
@@ -124,13 +141,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .flag.def{background:var(--bg4);color:var(--t2);}
 .list-item{font-size:12px;padding:6px 0;color:var(--t2);border-bottom:0.5px solid var(--border);line-height:1.55;display:flex;gap:8px;}
 .list-item:last-child{border-bottom:none;}
-.list-item-icon{flex-shrink:0;margin-top:1px;}
 .verdict-bar{padding:1.25rem;background:var(--bg3);border-top:0.5px solid var(--border);}
 .verdict-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
 .verdict-text{font-size:13px;color:var(--t1);line-height:1.65;}
 .zoning-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:var(--r2);background:var(--blue-bg);color:var(--blue);border:0.5px solid rgba(88,130,192,0.25);margin-top:8px;flex-wrap:wrap;}
 .zone-code{font-weight:500;font-family:'DM Serif Display',serif;font-size:14px;}
-
 .empty{text-align:center;padding:3rem 1rem;color:var(--t3);font-size:13px;line-height:1.8;}
 .empty-icon{font-size:32px;margin-bottom:12px;opacity:.4;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
@@ -142,6 +157,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 </head>
 <body>
 
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+    </div>
+    <h2>Clé API Anthropic requise</h2>
+    <p>Pour analyser les fiches immobilières depuis ce site, vous avez besoin d'une clé API Anthropic personnelle. Elle est stockée uniquement dans votre navigateur — jamais sur un serveur.</p>
+    <div class="api-steps">
+      <div class="api-step"><div class="api-step-num">1</div><div>Allez sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> et créez un compte (gratuit)</div></div>
+      <div class="api-step"><div class="api-step-num">2</div><div>Cliquez sur <strong style="color:var(--t1)">API Keys</strong> → <strong style="color:var(--t1)">Create Key</strong> → copiez la clé</div></div>
+      <div class="api-step"><div class="api-step-num">3</div><div>Collez-la ci-dessous — coût estimé : <strong style="color:var(--t1)">0,03 $ à 0,08 $</strong> par analyse</div></div>
+    </div>
+    <div class="api-input-row">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off"/>
+      <button class="api-save-btn" onclick="saveApiKey()">Enregistrer</button>
+    </div>
+    <div class="api-error" id="apiError">Clé invalide — elle doit commencer par "sk-ant-"</div>
+    <div class="api-note">🔒 Votre clé est sauvegardée dans votre navigateur (localStorage) et n'est jamais transmise à un tiers. Elle va directement de votre navigateur à l'API Anthropic.</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+
 <div class="masthead">
   <div class="masthead-icon">
     <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -150,6 +190,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
     <h1>Analyseur de fiches immobilières</h1>
     <p>MRB · Cashflow · Zonage · Valeur marchande · Risques · Négociation</p>
   </div>
+</div>
+
+<div class="api-banner">
+  <div class="api-banner-left">
+    <div class="api-dot"></div>
+    <span>API connectée · <span id="apiKeyHint"></span></span>
+  </div>
+  <button onclick="resetApiKey()">Changer de clé</button>
 </div>
 
 <div class="rate-strip">
@@ -167,11 +215,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
       Lien URL
     </button>
     <button class="tab-btn" id="tb-text" onclick="setTab('text')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Texte copié
     </button>
     <button class="tab-btn" id="tb-pdf" onclick="setTab('pdf')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15v-2h2v2H9zm4 0v-4h2v4h-2z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       PDF
     </button>
     <button class="tab-btn" id="tb-image" onclick="setTab('image')">
@@ -180,30 +228,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
     </button>
   </div>
 
-  <!-- URL -->
   <div class="tab-panel active" id="panel-url">
     <div class="input-row">
       <input type="text" id="urlInput" placeholder="https://www.centris.ca/...  ou  remax.ca/...  ou  duproprio.com/..."/>
       <button class="add-btn" onclick="addUrl()">+ Ajouter</button>
     </div>
-    <div class="hint">Collez un lien Centris, DuProprio, RE/MAX, Royal LePage ou Via Capitale. Si le site bloque l'accès, utilisez l'onglet <strong>Texte copié</strong>.</div>
+    <div class="hint">Centris bloque souvent l'accès automatique. Si ça ne fonctionne pas, utilisez <strong>Texte copié</strong> : ouvrez la fiche → Ctrl+A → Ctrl+C → collez ici.</div>
   </div>
 
-  <!-- TEXT -->
   <div class="tab-panel" id="panel-text">
     <div class="input-row" style="margin-bottom:8px;">
-      <input type="text" id="textLabel" placeholder="Nom ou adresse (ex: Triplex Verdun 695 Egan)"/>
+      <input type="text" id="textLabel" placeholder="Nom ou adresse (ex: Triplex 695 Egan Verdun)"/>
     </div>
     <div class="input-row">
-      <textarea id="textInput" placeholder="Collez ici le texte de la fiche. Sur Centris : ouvrez la page → Ctrl+A → Ctrl+C → coller ici.&#10;&#10;L'agent extrait automatiquement : prix, adresse, revenus, taxes, superficie, caractéristiques..."></textarea>
+      <textarea id="textInput" placeholder="Collez ici le texte de la fiche. Sur Centris : ouvrez la page → Ctrl+A → Ctrl+C → coller ici.&#10;&#10;L'agent extrait automatiquement : prix, adresse, revenus, taxes, superficie..."></textarea>
     </div>
     <div style="margin-top:8px;text-align:right;">
       <button class="add-btn" onclick="addText()">+ Ajouter</button>
     </div>
-    <div class="hint">Méthode recommandée pour Centris qui bloque les accès automatiques.</div>
   </div>
 
-  <!-- PDF -->
   <div class="tab-panel" id="panel-pdf">
     <div class="dropzone" id="pdfDrop" ondragover="onDrag(event,'pdfDrop')" ondragleave="offDrag('pdfDrop')" ondrop="onDrop(event,'pdf')">
       <input type="file" accept=".pdf,application/pdf" multiple onchange="onFileChange(event,'pdf')"/>
@@ -212,19 +256,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
       <div class="dz-sub">Fiches Centris exportées, évaluations municipales, rapports d'inspection...</div>
     </div>
     <div class="dz-previews" id="pdfPreviews"></div>
-    <div class="hint">Les PDF sont envoyés directement à l'IA qui les lit page par page.</div>
   </div>
 
-  <!-- IMAGE -->
   <div class="tab-panel" id="panel-image">
     <div class="dropzone" id="imgDrop" ondragover="onDrag(event,'imgDrop')" ondragleave="offDrag('imgDrop')" ondrop="onDrop(event,'image')">
       <input type="file" accept="image/*" multiple onchange="onFileChange(event,'image')"/>
       <div class="dz-icon">📸</div>
       <div class="dz-title">Glissez vos photos ici ou cliquez pour choisir</div>
-      <div class="dz-sub">Captures d'écran de fiches, photos de grilles de zonage, évaluations scannées...</div>
+      <div class="dz-sub">Photos de fiches, grilles de zonage (ex: RES-3114), captures d'écran...</div>
     </div>
     <div class="dz-previews" id="imgPreviews"></div>
-    <div class="hint">JPG, PNG, WEBP acceptés. Idéal pour les grilles de zonage comme RES-3114 ou les fiches photographiées.</div>
   </div>
 
   <div class="url-chips" id="itemList"></div>
@@ -237,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 </div>
 
 <div id="compareBar" style="display:none;" class="compare-bar">
-  <button onclick="compareAll()">Comparer toutes les fiches côte à côte ↗</button>
+  <button onclick="compareAll()">Comparer toutes les fiches ↗</button>
 </div>
 
 <div id="results">
@@ -248,13 +289,73 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
   </div>
 </div>
 
-<script>
-// ── State ────────────────────────────────────────────────────────────────────
-const items = [];   // {type, label, url?, text?, file?, fileType?, base64?, mediaType?}
-let rateData = null;
-let results = [];
+</div><!-- end mainApp -->
 
-// ── Tabs ─────────────────────────────────────────────────────────────────────
+<script>
+// ── API Key Management ────────────────────────────────────────────────────────
+const API_KEY_STORE = 'hh_api_key';
+let API_KEY = '';
+
+function getStoredKey() {
+  try { return localStorage.getItem(API_KEY_STORE) || ''; } catch(e) { return ''; }
+}
+function storeKey(k) {
+  try { localStorage.setItem(API_KEY_STORE, k); } catch(e) {}
+}
+function saveApiKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if (!k.startsWith('sk-ant-') && !k.startsWith('sk-')) {
+    document.getElementById('apiError').style.display = 'block';
+    return;
+  }
+  document.getElementById('apiError').style.display = 'none';
+  storeKey(k);
+  API_KEY = k;
+  showApp();
+}
+function resetApiKey() {
+  try { localStorage.removeItem(API_KEY_STORE); } catch(e) {}
+  API_KEY = '';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiModal').classList.remove('hidden');
+  document.getElementById('mainApp').style.display = 'none';
+}
+function showApp() {
+  document.getElementById('apiModal').classList.add('hidden');
+  document.getElementById('mainApp').style.display = 'block';
+  const hint = API_KEY.slice(0,10) + '...' + API_KEY.slice(-4);
+  document.getElementById('apiKeyHint').textContent = hint;
+  loadRates();
+}
+document.getElementById('apiKeyInput').addEventListener('keydown', e => { if (e.key==='Enter') saveApiKey(); });
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+  const k = getStoredKey();
+  if (k) { API_KEY = k; showApp(); }
+  else { document.getElementById('apiModal').classList.remove('hidden'); }
+});
+
+// ── API Call helper ───────────────────────────────────────────────────────────
+async function callAPI(body) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Erreur API ' + res.status);
+  }
+  return res.json();
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
 function setTab(t) {
   ['url','text','pdf','image'].forEach(x => {
     document.getElementById('panel-'+x).classList.toggle('active', x===t);
@@ -262,119 +363,92 @@ function setTab(t) {
   });
 }
 
-// ── Drag & drop ───────────────────────────────────────────────────────────────
-function onDrag(e, id) { e.preventDefault(); document.getElementById(id).classList.add('drag-over'); }
-function offDrag(id) { document.getElementById(id).classList.remove('drag-over'); }
-function onDrop(e, kind) {
-  e.preventDefault();
-  offDrag(kind==='pdf'?'pdfDrop':'imgDrop');
-  handleFiles([...e.dataTransfer.files], kind);
-}
-function onFileChange(e, kind) { handleFiles([...e.target.files], kind); e.target.value = ''; }
+// ── Files ─────────────────────────────────────────────────────────────────────
+const items = [];
+let rateData = null;
+let results = [];
+
+function onDrag(e,id){e.preventDefault();document.getElementById(id).classList.add('drag-over');}
+function offDrag(id){document.getElementById(id).classList.remove('drag-over');}
+function onDrop(e,kind){e.preventDefault();offDrag(kind==='pdf'?'pdfDrop':'imgDrop');handleFiles([...e.dataTransfer.files],kind);}
+function onFileChange(e,kind){handleFiles([...e.target.files],kind);e.target.value='';}
 
 function handleFiles(files, kind) {
   files.forEach(file => {
-    const isPdf = kind === 'pdf' || file.type === 'application/pdf';
-    const isImg = kind === 'image' || file.type.startsWith('image/');
-    if (!isPdf && !isImg) return;
+    const isPdf = kind==='pdf'||file.type==='application/pdf';
     const reader = new FileReader();
     reader.onload = ev => {
       const base64 = ev.target.result.split(',')[1];
-      const mediaType = file.type || (isPdf ? 'application/pdf' : 'image/jpeg');
-      const item = { type: isPdf ? 'pdf' : 'image', label: file.name, base64, mediaType, fileType: isPdf ? 'pdf' : 'image' };
-      // thumbnail for images
-      if (isImg) item.dataUrl = ev.target.result;
-      items.push(item);
+      const mediaType = file.type||(isPdf?'application/pdf':'image/jpeg');
+      items.push({type:isPdf?'pdf':'image',label:file.name,base64,mediaType});
       renderItems(); updateBtn();
     };
     reader.readAsDataURL(file);
-    // Show preview immediately
-    showFilePreview(file, kind);
+    // Preview
+    const container = document.getElementById(kind==='pdf'?'pdfPreviews':'imgPreviews');
+    const div = document.createElement('div');
+    div.className = 'dz-preview';
+    if (kind==='image') {
+      const img = document.createElement('img');
+      img.className = 'dz-preview-thumb';
+      img.src = URL.createObjectURL(file);
+      div.appendChild(img);
+    } else {
+      const ic = document.createElement('div');
+      ic.className = 'dz-preview-thumb pdf-thumb';
+      ic.textContent = '📄';
+      div.appendChild(ic);
+    }
+    const nm = document.createElement('span');
+    nm.textContent = file.name.slice(0,30)+(file.name.length>30?'…':'');
+    div.appendChild(nm);
+    container.appendChild(div);
   });
 }
 
-function showFilePreview(file, kind) {
-  const container = document.getElementById(kind==='pdf'?'pdfPreviews':'imgPreviews');
-  const div = document.createElement('div');
-  div.className = 'dz-preview';
-  div.id = 'prev_' + Date.now();
-  if (kind === 'image') {
-    const img = document.createElement('img');
-    img.className = 'dz-preview-thumb';
-    img.src = URL.createObjectURL(file);
-    div.appendChild(img);
-  } else {
-    const ic = document.createElement('div');
-    ic.className = 'dz-preview-thumb pdf-thumb';
-    ic.textContent = '📄';
-    div.appendChild(ic);
-  }
-  const nm = document.createElement('span');
-  nm.textContent = file.name.slice(0, 30) + (file.name.length > 30 ? '…' : '');
-  div.appendChild(nm);
-  container.appendChild(div);
-}
-
-// ── Item management ──────────────────────────────────────────────────────────
 function addUrl() {
   let v = document.getElementById('urlInput').value.trim();
   if (!v) return;
-  if (!v.startsWith('http')) v = 'https://' + v;
-  if (items.find(i => i.url === v)) return;
-  items.push({ type: 'url', url: v, label: v.replace(/https?:\/\/(www\.)?/, '').slice(0, 55) });
-  document.getElementById('urlInput').value = '';
+  if (!v.startsWith('http')) v='https://'+v;
+  if (items.find(i=>i.url===v)) return;
+  items.push({type:'url',url:v,label:v.replace(/https?:\/\/(www\.)?/,'').slice(0,55)});
+  document.getElementById('urlInput').value='';
   renderItems(); updateBtn();
 }
-document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key==='Enter') addUrl(); });
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')addUrl();});
 
 function addText() {
-  const t = document.getElementById('textInput').value.trim();
-  const lbl = document.getElementById('textLabel').value.trim();
-  if (!t) return;
-  items.push({ type: 'text', text: t, label: lbl || 'Fiche #' + (items.length + 1) });
-  document.getElementById('textInput').value = '';
-  document.getElementById('textLabel').value = '';
+  const t=document.getElementById('textInput').value.trim();
+  const lbl=document.getElementById('textLabel').value.trim();
+  if(!t)return;
+  items.push({type:'text',text:t,label:lbl||'Fiche #'+(items.length+1)});
+  document.getElementById('textInput').value='';
+  document.getElementById('textLabel').value='';
   renderItems(); updateBtn();
 }
 
-function removeItem(i) {
-  items.splice(i, 1);
-  renderItems(); updateBtn();
+function removeItem(i){items.splice(i,1);renderItems();updateBtn();}
+function renderItems(){
+  const l=document.getElementById('itemList');
+  if(!items.length){l.innerHTML='';return;}
+  const icons={url:'🔗',text:'📋',pdf:'📄',image:'📸'};
+  l.innerHTML=items.map((it,i)=>`<div class="url-chip"><span>${icons[it.type]||'📎'} ${it.label}</span><button onclick="removeItem(${i})">✕</button></div>`).join('');
 }
-
-function renderItems() {
-  const l = document.getElementById('itemList');
-  if (!items.length) { l.innerHTML = ''; return; }
-  const icons = { url: '🔗', text: '📋', pdf: '📄', image: '📸' };
-  l.innerHTML = items.map((it, i) => `<div class="url-chip">
-    <span><span class="url-chip-icon">${icons[it.type]||'📎'}</span>${it.label}</span>
-    <button onclick="removeItem(${i})">✕</button>
-  </div>`).join('');
-}
-function updateBtn() {
-  document.getElementById('analyzeBtn').disabled = items.length === 0;
-}
+function updateBtn(){document.getElementById('analyzeBtn').disabled=items.length===0;}
 
 // ── Rates ────────────────────────────────────────────────────────────────────
-const RKEY = 'hh_r5';
-async function loadRates() {
-  try {
-    const c = sessionStorage.getItem(RKEY);
-    if (c) { const p=JSON.parse(c); if(Date.now()-p.ts<3600000){applyRates(p.d);return p.d;} }
-  } catch(e){}
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:'Taux hypothécaires Québec. JSON: {"variable":"3.35%","fixe":"3.94%","source":"ratehub.ca","vn":3.35,"fn":3.94}',messages:[{role:'user',content:'Meilleurs taux variable et fixe 5 ans Québec aujourd\'hui.'}],tools:[{type:'web_search_20250305',name:'web_search'}]})});
-    const d=await res.json();
+const RKEY='hh_r6';
+async function loadRates(){
+  try{const c=sessionStorage.getItem(RKEY);if(c){const p=JSON.parse(c);if(Date.now()-p.ts<3600000){applyRates(p.d);return p.d;}}}catch(e){}
+  try{
+    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:200,system:'Taux hypothécaires Québec. JSON: {"variable":"3.35%","fixe":"3.94%","source":"ratehub.ca","vn":3.35,"fn":3.94}',messages:[{role:'user',content:'Meilleurs taux variable et fixe 5 ans Québec aujourd\'hui.'}],tools:[{type:'web_search_20250305',name:'web_search'}]});
     const t=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
     const r=parseJ(t)||{variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};
     sessionStorage.setItem(RKEY,JSON.stringify({ts:Date.now(),d:r}));
-    applyRates(r); return r;
-  } catch(e) {
-    const r={variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};
-    applyRates(r); return r;
-  }
+    applyRates(r);return r;
+  }catch(e){const r={variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};applyRates(r);return r;}
 }
-function applyRates(r) {
+function applyRates(r){
   rateData=r;
   document.getElementById('rVar').textContent=r.variable;
   document.getElementById('rFix').textContent=r.fixe;
@@ -382,7 +456,7 @@ function applyRates(r) {
   document.getElementById('rFixSrc').textContent=r.source||'Mis à jour';
 }
 
-// ── Local finance calcs ───────────────────────────────────────────────────────
+// ── Calcs ────────────────────────────────────────────────────────────────────
 function calcMDF(p){if(p<=500000)return{pct:5,val:Math.round(p*.05)};if(p<1000000)return{pct:parseFloat(((25000+(p-500000)*.1)/p*100).toFixed(1)),val:Math.round(25000+(p-500000)*.1)};return{pct:20,val:Math.round(p*.2)};}
 function calcVers(m,ta,mo){const r=ta/100/12;if(r===0)return m/mo;return m*r*Math.pow(1+r,mo)/(Math.pow(1+r,mo)-1);}
 function calcFin(prix,revA,taux,taxA){
@@ -391,114 +465,71 @@ function calcFin(prix,revA,taux,taxA){
   return{mdf:mdf.val,mdfPct:mdf.pct,vers:Math.round(v),cf,mrb:revA>0?Math.round(prix/revA*10)/10:null,rend:mdf.val>0&&revA>0?Math.round(cf*12/mdf.val*1000)/10:0};
 }
 
-// ── Analyze one item ──────────────────────────────────────────────────────────
-const SYS = `Tu es un expert en investissement immobilier au Québec. Analyse la fiche immobilière fournie (URL, texte, PDF ou image).
+// ── Analyze ──────────────────────────────────────────────────────────────────
+const SYS=`Tu es un expert en investissement immobilier au Québec. Analyse la fiche immobilière fournie.
 
-CALCULS (taux et amortissement fournis ci-dessous):
-- MRB = Prix / Revenus bruts annuels
-- Versement mensuel avec taux variable, mise de fonds minimale légale SCHL
-- Cashflow net = Revenus mensuels − Versement − Taxes mensuelles − Charges (32% revenus)
-- Rendement sur mise de fonds = Cashflow annuel / Mise de fonds
+CALCULS: MRB=Prix/Revenus bruts annuels. Versement avec taux variable fourni, mise de fonds SCHL minimale, amortissement 25 ans. Cashflow=Revenus-(Versement+Taxes+Charges 32%). Rendement=Cashflow annuel/Mise de fonds.
 
-MISE DE FONDS SCHL: 5% ≤500k · 5%+10% tranche 500k-999k · 20% ≥1M$
+SCHL: 5% ≤500k | 5%+10% tranche 500k-999k | 20% ≥1M$
 
-SCORE /10:
-MRB≤8:+3 | MRB≤10:+2 | Cashflow+:+3 | Cashflow>-300:+1 | Prix<valeur marchande:+2 | Subdivision:+2
-Score≥7 = MÉGA DEAL 🔥
+SCORE/10: MRB≤8:+3|MRB≤10:+2|Cashflow+:+3|Cashflow>-300:+1|Prix<marché:+2|Subdivision:+2. Score≥7=MÉGA DEAL.
 
-RECHERCHES À FAIRE via web_search:
-1. Taux hypothécaires variables Québec aujourd'hui (si non fournis)
-2. Zonage municipal de l'adresse sur le site de la ville
-3. Ventes comparables récentes dans le secteur
+RECHERCHES: 1) Zonage municipal de l'adresse (site de la ville) 2) Ventes comparables récentes.
 
-RÉPONDS UNIQUEMENT EN JSON:
-{"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","zonage_description":"","logements_max_permis":0,"zonage_source":"","score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
+JSON UNIQUEMENT:
+{"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","zonage_description":"","logements_max_permis":0,"score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
 
-async function analyzeFiche(item, rate) {
-  const taux = rate.vn || rate.variable_num || 3.35;
-  const sysWithRate = SYS + `\n\nTaux du jour: variable=${rate.variable}, fixe=${rate.fixe}, num=${taux}%\nAmortissement: 25 ans`;
-
+async function analyzeFiche(item,rate){
+  const taux=rate.vn||3.35;
+  const sys=SYS+`\n\nTaux du jour: variable=${rate.variable}, fixe=${rate.fixe} (utilise ${taux}% pour calculs)\nAmortissement: 25 ans`;
   let userContent;
+  if(item.type==='url') userContent=[{type:'text',text:'Analyse cette fiche: '+item.url}];
+  else if(item.type==='text') userContent=[{type:'text',text:'Analyse cette fiche:\n\n'+item.text}];
+  else if(item.type==='pdf') userContent=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:item.base64}},{type:'text',text:'Analyse complète de ce PDF immobilier.'}];
+  else userContent=[{type:'image',source:{type:'base64',media_type:item.mediaType||'image/jpeg',data:item.base64}},{type:'text',text:'Analyse complète de cette fiche immobilière (image). Extrais toutes les données visibles.'}];
 
-  if (item.type === 'url') {
-    userContent = [{ type: 'text', text: 'Analyse cette fiche immobilière: ' + item.url }];
-  } else if (item.type === 'text') {
-    userContent = [{ type: 'text', text: 'Analyse cette fiche immobilière:\n\n' + item.text }];
-  } else if (item.type === 'pdf') {
-    userContent = [
-      { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: item.base64 } },
-      { type: 'text', text: 'Analyse complète de cette fiche immobilière (PDF). Extrais toutes les données disponibles.' }
-    ];
-  } else if (item.type === 'image') {
-    userContent = [
-      { type: 'image', source: { type: 'base64', media_type: item.mediaType || 'image/jpeg', data: item.base64 } },
-      { type: 'text', text: 'Analyse complète de cette fiche immobilière (image). Extrais toutes les données visibles: prix, adresse, revenus, taxes, superficie, caractéristiques.' }
-    ];
-  }
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514', max_tokens: 1000,
-      system: sysWithRate,
-      messages: [{ role: 'user', content: userContent }],
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }]
-    })
-  });
-  const d = await res.json();
-  const f = parseJ((d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''));
-  if (!f) return null;
-
-  // Enrich with local calcs
-  if (f.prix && f.revenus_bruts_annuels) {
-    const c = calcFin(f.prix, f.revenus_bruts_annuels, taux, f.taxes_annuelles);
-    if (!f.mrb) f.mrb = c.mrb;
-    if (!f.mise_fonds_min) { f.mise_fonds_min = c.mdf; f.mise_fonds_pct = c.mdfPct; }
-    if (!f.versement_mensuel) f.versement_mensuel = c.vers;
-    if (!f.cashflow_mensuel) f.cashflow_mensuel = c.cf;
-    if (!f.rendement_mise_fonds_pct) f.rendement_mise_fonds_pct = c.rend;
-    if (!f.score_mega_deal) {
-      let s=0;
-      if(f.mrb){if(f.mrb<=8)s+=3;else if(f.mrb<=10)s+=2;}
-      if(f.cashflow_mensuel>0)s+=3;else if(f.cashflow_mensuel>-300)s+=1;
-      if(f.sous_valeur)s+=2;if(f.potentiel_sub)s+=2;
-      f.score_mega_deal=Math.min(s,10);
-    }
-    f.est_mega = f.score_mega_deal >= 7;
+  const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:userContent}],tools:[{type:'web_search_20250305',name:'web_search'}]});
+  const f=parseJ((d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''));
+  if(!f)return null;
+  if(f.prix&&f.revenus_bruts_annuels){
+    const c=calcFin(f.prix,f.revenus_bruts_annuels,taux,f.taxes_annuelles);
+    if(!f.mrb)f.mrb=c.mrb;
+    if(!f.mise_fonds_min){f.mise_fonds_min=c.mdf;f.mise_fonds_pct=c.mdfPct;}
+    if(!f.versement_mensuel)f.versement_mensuel=c.vers;
+    if(!f.cashflow_mensuel)f.cashflow_mensuel=c.cf;
+    if(!f.rendement_mise_fonds_pct)f.rendement_mise_fonds_pct=c.rend;
+    if(!f.score_mega_deal){let s=0;if(f.mrb){if(f.mrb<=8)s+=3;else if(f.mrb<=10)s+=2;}if(f.cashflow_mensuel>0)s+=3;else if(f.cashflow_mensuel>-300)s+=1;if(f.sous_valeur)s+=2;if(f.potentiel_sub)s+=2;f.score_mega_deal=Math.min(s,10);}
+    f.est_mega=f.score_mega_deal>=7;
   }
   return f;
 }
 
-// ── Orchestrator ──────────────────────────────────────────────────────────────
-async function analyzeAll() {
-  if (!items.length) return;
-  const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
-  results = [];
-  document.getElementById('results').innerHTML = '';
-  document.getElementById('compareBar').style.display = 'none';
-  setProgress(5, 'Taux du jour...');
-  const rate = await loadRates();
-
-  for (let i = 0; i < items.length; i++) {
-    setProgress(Math.round(10 + (i/items.length)*85), `Fiche ${i+1}/${items.length}...`);
-    const lid = 'ld_' + i;
-    const lDiv = document.createElement('div');
-    lDiv.id = lid; lDiv.className = 'report';
-    lDiv.innerHTML = `<div class="report-head"><div><div class="report-title"><span class="spinner"></span>Analyse en cours...</div><div class="report-addr">${items[i].label}</div></div></div>`;
+async function analyzeAll(){
+  if(!items.length)return;
+  const btn=document.getElementById('analyzeBtn');
+  btn.disabled=true;results=[];
+  document.getElementById('results').innerHTML='';
+  document.getElementById('compareBar').style.display='none';
+  setProgress(5,'Taux du jour...');
+  const rate=await loadRates();
+  for(let i=0;i<items.length;i++){
+    setProgress(Math.round(10+(i/items.length)*85),`Fiche ${i+1}/${items.length}...`);
+    const lid='ld_'+i;
+    const lDiv=document.createElement('div');
+    lDiv.id=lid;lDiv.className='report';
+    lDiv.innerHTML=`<div class="report-head"><div><div class="report-title"><span class="spinner"></span>Analyse en cours...</div><div class="report-addr">${items[i].label}</div></div></div>`;
     document.getElementById('results').appendChild(lDiv);
-    try {
-      const f = await analyzeFiche(items[i], rate);
-      if (f) { f._src = items[i].label; results.push(f); document.getElementById(lid).outerHTML = renderCard(f); }
-      else { document.getElementById(lid).outerHTML = `<div class="report"><div class="empty">Impossible d'analyser. Essayez l'onglet "Texte copié".</div></div>`; }
-    } catch(e) {
-      document.getElementById(lid).outerHTML = `<div class="report"><div class="empty">Erreur : ${e.message}</div></div>`;
+    try{
+      const f=await analyzeFiche(items[i],rate);
+      if(f){f._src=items[i].label;results.push(f);document.getElementById(lid).outerHTML=renderCard(f);}
+      else document.getElementById(lid).outerHTML=`<div class="report"><div class="empty">Impossible d'analyser. Essayez l'onglet "Texte copié".</div></div>`;
+    }catch(e){
+      document.getElementById(lid).outerHTML=`<div class="report"><div class="empty">Erreur: ${e.message}<br><br>Si votre clé API est incorrecte, cliquez "Changer de clé" en haut.</div></div>`;
     }
   }
-  setProgress(100,'');
-  setTimeout(()=>setProgress(0,''),1500);
-  btn.disabled = false;
-  if (results.length > 1) document.getElementById('compareBar').style.display = 'block';
+  setProgress(100,'');setTimeout(()=>setProgress(0,''),1500);
+  btn.disabled=false;
+  if(results.length>1)document.getElementById('compareBar').style.display='block';
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -506,22 +537,20 @@ function parseJ(t){try{return JSON.parse((t||'').replace(/```json|```/g,'').trim
 function fmt(n){return n?n.toLocaleString('fr-CA')+'\u202f$':'N/A';}
 function fmtK(n){return n?(n/1000).toFixed(0)+'k\u202f$':'N/A';}
 function setProgress(pct,lbl){document.getElementById('pBar').style.width=pct+'%';document.getElementById('stepLbl').textContent=lbl||'';}
-function rOffset(s){return 132-(s/10)*132;}
-function rClass(s){return s>=7?'fire':s>=5?'good':'meh';}
 function rColor(s){return s>=7?'var(--accent)':s>=5?'var(--green)':'var(--t3)';}
+function rOffset(s){return 132-(s/10)*132;}
 
-function renderCard(f) {
+function renderCard(f){
   const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel;
   const cfC=cf>0?'g':cf<0?'b':'w';
   const cfL=(cf!==undefined&&cf!==null)?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'N/A';
   const isMega=sc>=7;
   const ecart=f.eval_municipale&&f.prix?Math.round((f.prix-f.eval_municipale)/f.eval_municipale*100):null;
-
-  const flags=(f.flags||[]).map(fl=>{const l=fl.toLowerCase();if(l.includes('cashflow')||l.includes('cash'))return`<span class="flag cf">${fl}</span>`;if(l.includes('mrb')||l.includes('valeur')||l.includes('prix'))return`<span class="flag hot">${fl}</span>`;if(l.includes('subdivision')||l.includes('zonage')||l.includes('terrain'))return`<span class="flag sub">${fl}</span>`;if(l.includes('risque')||l.includes('garantie'))return`<span class="flag risk">${fl}</span>`;return`<span class="flag def">${fl}</span>`;}).join('');
-  const risques=(f.risques||[]).map(r=>`<div class="list-item"><span class="list-item-icon" style="color:var(--red)">⚠</span><span>${r}</span></div>`).join('');
-  const nego=(f.points_negociation||[]).map(n=>`<div class="list-item"><span class="list-item-icon" style="color:var(--accent)">—</span><span>${n}</span></div>`).join('');
+  const flags=(f.flags||[]).map(fl=>{const l=fl.toLowerCase();if(l.includes('cashflow'))return`<span class="flag cf">${fl}</span>`;if(l.includes('mrb')||l.includes('valeur')||l.includes('prix'))return`<span class="flag hot">${fl}</span>`;if(l.includes('subdivision')||l.includes('zonage')||l.includes('terrain'))return`<span class="flag sub">${fl}</span>`;if(l.includes('risque')||l.includes('garantie'))return`<span class="flag risk">${fl}</span>`;return`<span class="flag def">${fl}</span>`;}).join('');
+  const risques=(f.risques||[]).map(r=>`<div class="list-item"><span style="color:var(--red);flex-shrink:0;">⚠</span><span>${r}</span></div>`).join('');
+  const nego=(f.points_negociation||[]).map(n=>`<div class="list-item"><span style="color:var(--accent);flex-shrink:0;">—</span><span>${n}</span></div>`).join('');
   const chars=(f.caracteristiques||[]).slice(0,8).map(c=>`<span class="flag def">${c}</span>`).join('');
-  const zoning=f.zonage_code?`<div class="zoning-badge"><span>Zone</span><span class="zone-code">${f.zonage_code}</span>${f.logements_max_permis?`<span>· max <strong>${f.logements_max_permis}</strong> logements</span>`:''  }${f.zonage_description?`<span style="color:var(--t3)">· ${f.zonage_description}</span>`:''}</div>`:'';
+  const zoning=f.zonage_code?`<div class="zoning-badge"><span>Zone</span><span class="zone-code">${f.zonage_code}</span>${f.logements_max_permis?`<span>· max <strong>${f.logements_max_permis}</strong> logements</span>`:''}</div>`:'';
 
   return`<div class="report${isMega?' mega':''}">
     <div class="report-head">
@@ -533,10 +562,7 @@ function renderCard(f) {
         ${zoning}
       </div>
       <div class="score-ring">
-        <svg viewBox="0 0 52 52">
-          <circle cx="26" cy="26" r="21" fill="none" stroke="var(--bg4)" stroke-width="4"/>
-          <circle class="score-ring-fill" cx="26" cy="26" r="21" fill="none" stroke="${rColor(sc)}" stroke-width="4" stroke-dashoffset="${rOffset(sc)}"/>
-        </svg>
+        <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="21" fill="none" stroke="var(--bg4)" stroke-width="4"/><circle cx="26" cy="26" r="21" fill="none" stroke="${rColor(sc)}" stroke-width="4" stroke-dasharray="132" stroke-dashoffset="${rOffset(sc)}" stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:center;"/></svg>
         <div class="score-num" style="color:${rColor(sc)}">${sc}<div class="score-denom">/10</div></div>
       </div>
     </div>
@@ -574,14 +600,10 @@ function renderCard(f) {
   </div>`;
 }
 
-function compareAll() {
-  if (results.length < 2) return;
-  const s = results.map(f=>`${f.titre||f.adresse} — Score: ${f.score_mega_deal}/10 — Prix: ${f.prix?(f.prix/1000).toFixed(0)+'k$':'?'} — MRB: ${f.mrb?f.mrb.toFixed(1):'N/A'} — Cashflow: ${f.cashflow_mensuel!==undefined?(f.cashflow_mensuel>0?'+':'')+f.cashflow_mensuel+'$/mois':'N/A'} — Zone: ${f.zonage_code||'N/A'}`).join('\n');
-  if (typeof sendPrompt==='function') sendPrompt('Compare ces fiches et dis-moi laquelle est le meilleur achat:\n\n'+s);
-  else alert(s);
+function compareAll(){
+  if(results.length<2)return;
+  alert('Comparaison:\n\n'+results.map(f=>`${f.titre||f.adresse}\nScore: ${f.score_mega_deal}/10 | Prix: ${f.prix?(f.prix/1000).toFixed(0)+'k$':'?'} | MRB: ${f.mrb?f.mrb.toFixed(1):'N/A'} | Cashflow: ${f.cashflow_mensuel!==undefined?(f.cashflow_mensuel>0?'+':'')+f.cashflow_mensuel+'$/mois':'N/A'}`).join('\n\n'));
 }
-
-loadRates();
 </script>
 </body>
 </html>
