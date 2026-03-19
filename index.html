@@ -395,61 +395,38 @@ function compressImage(dataUrl, maxWidth, quality, callback) {
   img.src = dataUrl;
 }
 
-async function compressPDF(dataUrl, filename) {
+async function extractPDFText(dataUrl, filename) {
   try {
-    // Show processing state
-    const previewDiv = document.querySelector('.dz-preview:last-child span');
-    if (previewDiv) previewDiv.textContent = 'Compression PDF...';
-
     const base64 = dataUrl.split(',')[1];
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
 
-    // Load PDF with PDF.js
     const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
     const totalPages = pdf.numPages;
-    const maxPages = Math.min(totalPages, 8); // Max 8 pages to stay under token limit
-    const pageImages = [];
+    let fullText = '';
 
-    for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1.2 }); // 1.2x scale for readability
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      // Cap width at 1400px
-      let scale = 1.2;
-      if (viewport.width > 1400) scale = 1400 / (viewport.width / 1.2);
-      const scaledViewport = page.getViewport({ scale });
-      canvas.width = scaledViewport.width;
-      canvas.height = scaledViewport.height;
-
-      await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
-
-      // Compress each page as JPEG
-      const pageBase64 = canvas.toDataURL('image/jpeg', 0.72).split(',')[1];
-      pageImages.push(pageBase64);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(' ');
+      fullText += `--- Page ${pageNum} ---\n${pageText}\n\n`;
     }
 
-    // Build multi-page item — send as multiple images in one message
+    // Clean up: remove excessive whitespace
+    fullText = fullText.replace(/\s{3,}/g, '  ').trim();
+
     items.push({
-      type: 'pdf_pages',
-      label: filename + (totalPages > maxPages ? ` (${maxPages}/${totalPages} pages)` : ` (${totalPages} pages)`),
-      pages: pageImages,
-      mediaType: 'image/jpeg'
+      type: 'pdf_text',
+      label: filename + ` (${totalPages} pages · texte extrait)`,
+      text: fullText,
+      filename
     });
     renderItems(); updateBtn();
 
-    // Update preview label
-    const chips = document.querySelectorAll('.url-chip span');
-    const last = chips[chips.length - 1];
-    if (last && last.textContent.includes(filename.slice(0,10))) {
-      last.textContent = '📄 ' + filename.slice(0,30) + ` — ${pageImages.length} pages compressées`;
-    }
   } catch(e) {
-    // Fallback: send raw base64 if PDF.js fails
-    console.warn('PDF.js failed, sending raw:', e);
+    console.warn('PDF text extraction failed:', e);
+    // Fallback to raw base64
     const base64 = dataUrl.split(',')[1];
     items.push({type:'pdf', label:filename, base64, mediaType:'application/pdf'});
     renderItems(); updateBtn();
@@ -468,7 +445,7 @@ function handleFiles(files, kind) {
           renderItems(); updateBtn();
         });
       } else {
-        compressPDF(dataUrl, file.name);
+        extractPDFText(dataUrl, file.name);
       }
     };
     reader.readAsDataURL(file);
@@ -574,9 +551,13 @@ async function analyzeFiche(item,rate){
   if(item.type==='url') userContent=[{type:'text',text:'Analyse cette fiche: '+item.url}];
   else if(item.type==='text') userContent=[{type:'text',text:'Analyse cette fiche:\n\n'+item.text}];
   else if(item.type==='pdf') userContent=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:item.base64}},{type:'text',text:'Analyse complète de ce PDF immobilier.'}];
+  else if(item.type==='pdf_text') {
+    userContent=[{type:'text',text:`Analyse complète de cette fiche immobilière. Voici le texte extrait du PDF:\n\n${item.text}`}];
+  }
   else if(item.type==='pdf_pages') {
-    userContent=item.pages.map(p=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:p}}));
-    userContent.push({type:'text',text:`Analyse complète de cette fiche immobilière PDF (${item.pages.length} pages). Extrais toutes les données: prix, adresse, revenus, taxes, évaluation municipale, superficie, caractéristiques.`});
+    const pagesToSend = item.pages.slice(0, 3);
+    userContent = pagesToSend.map(p=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:p}}));
+    userContent.push({type:'text',text:`Analyse complète de cette fiche immobilière PDF (${pagesToSend.length} pages).`});
   }
   else userContent=[{type:'image',source:{type:'base64',media_type:item.mediaType||'image/jpeg',data:item.base64}},{type:'text',text:'Analyse complète de cette fiche immobilière (image). Extrais toutes les données visibles.'}];
 
