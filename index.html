@@ -355,6 +355,21 @@ function showApp() {
   document.getElementById('apiKeyHint').textContent = hint;
   loadRates();
   updateHistCount();
+  // Check if a fiche was passed via URL param (from bookmarklet)
+  const params = new URLSearchParams(window.location.search);
+  const ficheParam = params.get('fiche');
+  if (ficheParam) {
+    const text = decodeURIComponent(ficheParam);
+    const label = text.split('\n')[0].replace('URL: ','').slice(0,60) || 'Fiche Centris';
+    items.push({type:'text', text, label});
+    renderItems(); updateBtn();
+    // Clean URL without reload
+    window.history.replaceState({}, '', window.location.pathname);
+    // Auto-scroll to analyze button
+    setTimeout(() => {
+      document.getElementById('analyzeBtn').scrollIntoView({behavior:'smooth'});
+    }, 500);
+  }
 }
 document.getElementById('apiKeyInput').addEventListener('keydown', e => { if (e.key==='Enter') saveApiKey(); });
 
