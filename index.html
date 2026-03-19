@@ -669,9 +669,6 @@ function addUrl(){let v=document.getElementById('urlIn').value.trim();if(!v)retu
 document.getElementById('urlIn').addEventListener('keydown',e=>{if(e.key==='Enter')addUrl();});
 function addText(){const t=document.getElementById('txtIn').value.trim(),l=document.getElementById('txtLabel').value.trim();if(!t)return;items.push({type:'text',text:t,label:l||'Fiche #'+(items.length+1)});document.getElementById('txtIn').value='';document.getElementById('txtLabel').value='';renderItems();updBtn();}
 function removeItem(i){items.splice(i,1);renderItems();updBtn();}
-function renderItems(){
-  const l=document.getElementById('itemList');if(!items.length){l.innerHTML='';return;}
-  const ic={url:'🔗',text:'📋',pdf:'📄',pdf_text:'📄',image:'📸'};
 function propIcon(type,titre){
   if(!type&&!titre)return'🏢';
   const t=(type||'').toLowerCase()+(titre||'').toLowerCase();
@@ -685,6 +682,9 @@ function propIcon(type,titre){
   if(t.includes('terrain'))return'🌿';
   return'🏢';
 }
+function renderItems(){
+  const l=document.getElementById('itemList');if(!items.length){l.innerHTML='';return;}
+  const ic={url:'🔗',text:'📋',pdf:'📄',pdf_text:'📄',image:'📸'};
   l.innerHTML=items.map((it,i)=>`<div class="item"><span>${ic[it.type]||'📎'} ${it.label}</span><button onclick="removeItem(${i})">✕</button></div>`).join('');
 }
 function updBtn(){document.getElementById('analyzeBtn').disabled=items.length===0;}
@@ -845,15 +845,7 @@ function toggleER(id){
   a.classList.toggle('open');
 }
 
-function renderCard(f){
-  const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel;
-  const isMega=sc>=7,isBad=sc<=3;
-  const cfStr=cf!=null?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'N/A';
-  const cfCls=cf>0?'g':cf<0?'r':'a';
-  const ecart=f.eval_municipale&&f.prix?Math.round((f.prix-f.eval_municipale)/f.eval_municipale*100):null;
-  const sColor=sc>=7?'var(--green)':sc>=5?'var(--amber)':sc>=3?'#f97316':'var(--red)';
-  const sBg=sc>=7?'var(--green-bg)':sc>=5?'var(--amber-bg)':sc>=3?'#fff7ed':'var(--red-bg)';
-  // Dynamic score icon
+// Dynamic score icon
 function scoreIcon(sc){
   if(sc>=9)return'🔥';
   if(sc>=7)return'⭐';
@@ -869,7 +861,15 @@ function marketWeather(f){
   if(mrb<=12&&cf>-300)return{icon:'🌤️',label:'Marché tiède',color:'var(--t2)'};
   return{icon:'❄️',label:'Marché froid',color:'var(--blue)'};
 }
-const badge=isMega?`<div class="res-badge mega">${scoreIcon(sc)} Méga deal</div>`:isBad?`<div class="res-badge bad">⚠️ Deal à éviter</div>`:(sc>=5?`<div class="res-badge" style="background:var(--amber-bg);color:var(--amber);">${scoreIcon(sc)} Deal potentiel</div>`:'');
+function renderCard(f){
+  const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel;
+  const isMega=sc>=7,isBad=sc<=3;
+  const cfStr=cf!=null?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'N/A';
+  const cfCls=cf>0?'g':cf<0?'r':'a';
+  const ecart=f.eval_municipale&&f.prix?Math.round((f.prix-f.eval_municipale)/f.eval_municipale*100):null;
+  const sColor=sc>=7?'var(--green)':sc>=5?'var(--amber)':sc>=3?'#f97316':'var(--red)';
+  const sBg=sc>=7?'var(--green-bg)':sc>=5?'var(--amber-bg)':sc>=3?'#fff7ed':'var(--red-bg)';
+  const badge=isMega?`<div class="res-badge mega">${scoreIcon(sc)} Méga deal</div>`:isBad?`<div class="res-badge bad">⚠️ Deal à éviter</div>`:(sc>=5?`<div class="res-badge" style="background:var(--amber-bg);color:var(--amber);">${scoreIcon(sc)} Deal potentiel</div>`:'');
   const zone=f.zonage_code?`<div class="res-zone">📍 ${f.zonage_code}${f.logements_max_permis?` · max ${f.logements_max_permis} log.`:''}</div>`:'';
   const weather=marketWeather(f);
   const weatherHtml=`<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:${weather.color};margin-top:4px;">${weather.icon} ${weather.label}</span>`;
