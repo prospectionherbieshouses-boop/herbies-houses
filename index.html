@@ -3,712 +3,561 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Analyseur de fiches immobilières — Herbie's Houses</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<title>Herbie's Houses — Analyseur immobilier</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --bg:#0f0f0e;--bg2:#181817;--bg3:#1f1f1e;--bg4:#252524;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
-  --t1:#f0ede8;--t2:#9b9890;--t3:#5a5855;
-  --accent:#d4a853;--accent2:#b8894a;
-  --green:#4a9e6b;--green-bg:rgba(74,158,107,0.12);
-  --red:#c05454;--red-bg:rgba(192,84,84,0.12);
-  --amber:#c8903a;--amber-bg:rgba(200,144,58,0.12);
-  --blue:#5882c0;--blue-bg:rgba(88,130,192,0.12);
-  --r:10px;--r2:6px;
-}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;padding:2rem 1.5rem;}
+:root{
+  --bg:#f5f5f3;
+  --white:#ffffff;
+  --border:#e8e8e4;
+  --border2:#d4d4ce;
+  --t1:#111110;
+  --t2:#666662;
+  --t3:#a8a8a0;
+  --green:#166534;
+  --green-bg:#dcfce7;
+  --green-light:#f0fdf4;
+  --red:#991b1b;
+  --red-bg:#fee2e2;
+  --amber:#92400e;
+  --amber-bg:#fef3c7;
+  --blue:#1e3a8a;
+  --blue-bg:#dbeafe;
+  --r:10px;
+  --r2:7px;
+  --sh:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --sh2:0 4px 12px rgba(0,0,0,0.10);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;font-size:14px;line-height:1.5;}
 
-/* API KEY MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;}
-.modal-overlay.hidden{display:none;}
-.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:2rem;max-width:480px;width:100%;}
-.modal-icon{width:48px;height:48px;border-radius:var(--r);background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;}
-.modal-icon svg{width:24px;height:24px;stroke:#0f0f0e;fill:none;stroke-width:1.8;}
-.modal h2{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;margin-bottom:.5rem;}
-.modal p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:1.25rem;}
-.modal a{color:var(--accent);text-decoration:none;}
-.modal a:hover{text-decoration:underline;}
-.api-steps{background:var(--bg3);border-radius:var(--r2);padding:1rem;margin-bottom:1.25rem;}
-.api-step{display:flex;gap:10px;font-size:12px;color:var(--t2);margin-bottom:8px;line-height:1.5;}
-.api-step:last-child{margin-bottom:0;}
-.api-step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#0f0f0e;font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.api-input-row{display:flex;gap:8px;margin-bottom:.75rem;}
-.api-input-row input{flex:1;padding:10px 14px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;letter-spacing:.05em;}
-.api-input-row input:focus{border-color:var(--accent2);}
-.api-save-btn{padding:10px 20px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0f0f0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
-.api-note{font-size:11px;color:var(--t3);line-height:1.6;}
-.api-error{font-size:12px;color:var(--red);margin-top:8px;display:none;}
+/* TOPBAR */
+.topbar{background:var(--white);border-bottom:1px solid var(--border);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;box-shadow:var(--sh);}
+.tb-left{display:flex;align-items:center;gap:8px;}
+.tb-logo{width:26px;height:26px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.tb-logo svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;}
+.tb-name{font-size:14px;font-weight:700;color:var(--t1);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.api-dot-wrap{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.btn-ghost{background:none;border:1px solid var(--border2);color:var(--t2);font-size:12px;padding:4px 10px;border-radius:20px;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-ghost:hover{border-color:var(--t2);color:var(--t1);}
 
-/* API KEY BANNER */
-.api-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);padding:8px 14px;margin-bottom:1rem;flex-wrap:wrap;}
-.api-banner-left{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);}
-.api-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
-.api-banner button{font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;}
-.api-banner button:hover{color:var(--accent);}
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);display:flex;padding:0 20px;gap:0;}
+.nav-btn{background:none;border:none;border-bottom:2px solid transparent;padding:11px 14px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:-1px;transition:color .15s;}
+.nav-btn:hover{color:var(--t1);}
+.nav-btn.on{color:var(--green);border-bottom-color:var(--green);}
+.nav-badge{display:inline-block;background:var(--green-bg);color:var(--green);font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;vertical-align:middle;}
 
-.masthead{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;}
-.masthead-icon{width:48px;height:48px;border-radius:var(--r);background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.masthead-icon svg{width:24px;height:24px;stroke:#0f0f0e;fill:none;stroke-width:1.8;}
-.masthead-text h1{font-family:'DM Serif Display',serif;font-size:21px;font-weight:400;color:var(--t1);letter-spacing:-.02em;}
-.masthead-text p{font-size:11px;color:var(--t3);margin-top:2px;}
+/* CONTENT */
+.content{max-width:860px;margin:0 auto;padding:20px;}
 
-.rate-strip{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
-.rate-pill{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r2);padding:8px 14px;flex:1;min-width:110px;}
-.rpl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
-.rpv{font-size:16px;font-weight:500;color:var(--accent);}
-.rps{font-size:10px;color:var(--t3);margin-top:1px;}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:14px;overflow:hidden;}
+.card-title{font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;padding:12px 16px;border-bottom:1px solid var(--border);}
 
-.input-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem;}
-.input-card>label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:10px;}
-.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-.tab-btn{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px;}
-.tab-btn.active{background:rgba(212,168,83,0.15);color:var(--accent);border-color:var(--accent2);}
-.tab-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
+/* PARAMS */
+.params-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;}
+.params-toggle-left{display:flex;align-items:center;gap:12px;}
+.params-toggle h3{font-size:13px;font-weight:600;}
+.params-pills{display:flex;gap:8px;}
+.pill{font-size:11px;font-weight:600;padding:3px 8px;background:var(--green-bg);color:var(--green);border-radius:20px;}
+.params-arrow{color:var(--t3);font-size:11px;transition:transform .2s;}
+.params-arrow.open{transform:rotate(180deg);}
+.params-body{display:none;padding:14px 16px;border-top:1px solid var(--border);}
+.params-body.open{display:block;}
+.sliders{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:500px){.sliders{grid-template-columns:1fr;}}
+.slider-row label{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:7px;}
+.slider-row label strong{font-size:14px;font-weight:700;color:var(--green);}
+input[type=range]{width:100%;accent-color:var(--green);}
+.range-hints{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:3px;}
+.schl-box{margin-top:14px;background:var(--green-light);border-radius:var(--r2);padding:10px 12px;font-size:11px;color:var(--green);line-height:1.7;}
 
-.input-row{display:flex;gap:8px;}
-.input-row input{flex:1;padding:10px 14px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s;}
-.input-row input:focus{border-color:var(--accent2);}
-.input-row textarea{flex:1;padding:10px 14px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:90px;transition:border .15s;}
-.input-row textarea:focus{border-color:var(--accent2);}
+/* TABS */
+.utabs{display:flex;gap:6px;padding:12px 16px 0;}
+.utab{background:none;border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+.utab.on{background:var(--green-bg);color:var(--green);border-color:#86efac;}
+.upanel{display:none;padding:12px 16px 14px;}
+.upanel.on{display:block;}
 
-.dropzone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:2rem 1rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
-.dropzone:hover,.dropzone.drag-over{border-color:var(--accent2);background:rgba(212,168,83,0.05);}
-.dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.dz-icon{font-size:28px;margin-bottom:8px;opacity:.5;}
-.dz-title{font-size:13px;color:var(--t2);margin-bottom:4px;}
-.dz-sub{font-size:11px;color:var(--t3);}
-.dz-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-.dz-preview{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);font-size:12px;color:var(--t2);}
-.dz-preview-thumb{width:36px;height:36px;border-radius:4px;object-fit:cover;}
-.dz-preview-thumb.pdf-thumb{display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg4);}
-.dz-preview button{background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;padding:0 2px;margin-left:4px;}
-.dz-preview button:hover{color:var(--red);}
+/* INPUTS */
+.row{display:flex;gap:8px;}
+input[type=text],textarea{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r2);font-size:13px;font-family:'Inter',sans-serif;color:var(--t1);outline:none;transition:border .15s;}
+input[type=text]:focus,textarea:focus{border-color:var(--green);}
+textarea{resize:vertical;min-height:90px;margin-top:8px;}
+.hint{font-size:11px;color:var(--t3);margin-top:7px;line-height:1.6;}
+.btn{padding:9px 16px;background:var(--green);color:#fff;border:none;border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;flex-shrink:0;}
+.btn:hover{background:#14532d;}
+.btn:disabled{background:#86efac;cursor:default;}
 
-.add-btn{padding:10px 18px;border-radius:var(--r2);border:none;background:var(--accent);color:#0f0f0e;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity .15s;flex-shrink:0;}
-.add-btn:hover{opacity:.85;}
+/* DROPZONE */
+.dz{border:2px dashed var(--border2);border-radius:var(--r);padding:22px;text-align:center;cursor:pointer;position:relative;transition:all .2s;}
+.dz:hover,.dz.over{border-color:var(--green);background:var(--green-light);}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{font-size:22px;margin-bottom:5px;}
+.dz-t{font-size:13px;color:var(--t2);margin-bottom:2px;}
+.dz-s{font-size:11px;color:var(--t3);}
+.previews{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.prev-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--green-light);border:1px solid #86efac;border-radius:20px;font-size:11px;font-weight:500;color:var(--green);}
 
-.url-chips{display:flex;flex-direction:column;gap:5px;margin-top:10px;}
-.url-chip{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);font-size:12px;}
-.url-chip span{color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88%;}
-.url-chip button{background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:0;flex-shrink:0;}
-.url-chip button:hover{color:var(--red);}
-.hint{font-size:11px;color:var(--t3);margin-top:10px;line-height:1.6;}
+/* ITEM LIST */
+.items{display:flex;flex-direction:column;gap:5px;padding:0 16px 14px;}
+.item{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);font-size:12px;}
+.item span{color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.item button{background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:0 0 0 8px;flex-shrink:0;}
+.item button:hover{color:var(--red);}
 
-.analyze-wrap{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
-.analyze-btn{padding:11px 28px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0f0f0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Serif Display',serif;letter-spacing:.01em;transition:opacity .15s;}
-.analyze-btn:hover{opacity:.88;}
-.analyze-btn:disabled{opacity:.35;cursor:default;}
-.progress-wrap{flex:1;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;transition:width .4s;width:0;}
-.step-lbl{font-size:11px;color:var(--t3);min-width:140px;text-align:right;}
+/* ANALYZE ROW */
+.analyze-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.progress{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--green);width:0;transition:width .4s;}
+.step-txt{font-size:11px;color:var(--t3);min-width:110px;text-align:right;}
 
-.report{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem;animation:fadeUp .4s ease both;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
-.report.mega{border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;}
-.report-head{padding:1.25rem 1.25rem 1rem;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-.report-title{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;color:var(--t1);margin-bottom:4px;}
-.report-addr{font-size:12px;color:var(--t2);}
-.report-src{font-size:11px;color:var(--t3);margin-top:3px;}
-.mega-label{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 9px;border-radius:20px;background:var(--amber-bg);color:var(--accent);border:0.5px solid rgba(212,168,83,0.3);margin-bottom:6px;}
-.score-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
-.score-ring svg{width:52px;height:52px;transform:rotate(-90deg);}
-.score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:500;line-height:1;text-align:center;}
-.score-denom{font-size:9px;color:var(--t3);}
-.report-body{padding:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-@media(max-width:560px){.report-body{grid-template-columns:1fr;}}
-.section{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r2);padding:1rem;}
-.section.full{grid-column:1/-1;}
-.section-title{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-.section-title::after{content:'';flex:1;height:.5px;background:var(--border);}
-.kv{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px;}
+/* RESULT CARDS */
+.res-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:14px;overflow:hidden;animation:up .35s ease both;}
+@keyframes up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.res-card.mega{border-left:4px solid var(--green);}
+.res-card.bad{border-left:4px solid var(--red);}
+
+.res-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.res-hl{flex:1;min-width:0;}
+.res-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-bottom:5px;}
+.res-badge.mega{background:var(--green-bg);color:var(--green);}
+.res-badge.bad{background:var(--red-bg);color:var(--red);}
+.res-title{font-size:15px;font-weight:700;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.res-addr{font-size:12px;color:var(--t2);}
+.res-zone{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:2px 8px;border-radius:20px;}
+
+.score-ring{width:50px;height:50px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:2px solid;}
+.score-n{font-size:17px;font-weight:800;line-height:1;}
+.score-d{font-size:9px;font-weight:600;opacity:.6;}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));border-bottom:1px solid var(--border);}
+.kpi{padding:10px 16px;border-right:1px solid var(--border);}
+.kpi:last-child{border-right:none;}
+.kpi-l{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.kpi-v{font-size:14px;font-weight:700;}
+.kpi-v.g{color:var(--green);}
+.kpi-v.r{color:var(--red);}
+.kpi-v.a{color:var(--amber);}
+.kpi-v.b{color:var(--blue);}
+
+.res-body{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:500px){.res-body{grid-template-columns:1fr;}}
+.sec{background:var(--bg);border-radius:var(--r2);padding:12px;}
+.sec.full{grid-column:1/-1;}
+.sec-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:8px;}
+.kv{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;}
 .kv:last-child{border-bottom:none;}
 .kk{color:var(--t2);}
-.kv-val{font-weight:500;color:var(--t1);}
-.kv-val.g{color:var(--green);}
-.kv-val.b{color:var(--red);}
-.kv-val.w{color:var(--amber);}
-.kv-val.a{color:var(--accent);}
-.flags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
-.flag{font-size:11px;padding:3px 9px;border-radius:20px;}
-.flag.cf{background:var(--green-bg);color:var(--green);}
-.flag.hot{background:var(--amber-bg);color:var(--accent);}
-.flag.sub{background:var(--blue-bg);color:var(--blue);}
-.flag.risk{background:var(--red-bg);color:var(--red);}
-.flag.def{background:var(--bg4);color:var(--t2);}
-.list-item{font-size:12px;padding:6px 0;color:var(--t2);border-bottom:0.5px solid var(--border);line-height:1.55;display:flex;gap:8px;}
+.vv{font-weight:600;}
+.vv.g{color:var(--green);}
+.vv.r{color:var(--red);}
+.vv.a{color:var(--amber);}
+.vv.b{color:var(--blue);}
+
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;}
+.tag.risk{background:var(--red-bg);color:var(--red);}
+.tag.ok{background:var(--green-bg);color:var(--green);}
+.tag.info{background:var(--blue-bg);color:var(--blue);}
+.tag.neutral{background:var(--bg);color:var(--t2);border:1px solid var(--border2);}
+
+.list-item{display:flex;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--t2);line-height:1.5;}
 .list-item:last-child{border-bottom:none;}
-.verdict-bar{padding:1.25rem;background:var(--bg3);border-top:0.5px solid var(--border);}
-.verdict-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.verdict-text{font-size:13px;color:var(--t1);line-height:1.65;}
-.zoning-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:var(--r2);background:var(--blue-bg);color:var(--blue);border:0.5px solid rgba(88,130,192,0.25);margin-top:8px;flex-wrap:wrap;}
-.zone-code{font-weight:500;font-family:'DM Serif Display',serif;font-size:14px;}
-.empty{text-align:center;padding:3rem 1rem;color:var(--t3);font-size:13px;line-height:1.8;}
-.hist-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
-.hist-bar h3{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;color:var(--t1);}
-.hist-bar button{font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:var(--r2);border:0.5px solid var(--border);}
-.hist-bar button:hover{color:var(--red);border-color:var(--red);}
-.hist-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:8px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.hist-card:hover{border-color:var(--accent2);}
-.hist-card.mega{border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;}
-.hist-card-left{flex:1;min-width:0;}
-.hist-card-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.hist-card-meta{font-size:11px;color:var(--t3);}
-.hist-card-score{font-size:13px;font-weight:500;flex-shrink:0;}
-.hist-section-title{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;margin-top:1rem;}
-.empty-icon{font-size:32px;margin-bottom:12px;opacity:.4;}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
+.li-icon{flex-shrink:0;margin-top:1px;}
+
+.verdict{padding:12px 16px;background:var(--bg);border-top:1px solid var(--border);font-size:13px;line-height:1.65;}
+
+/* HISTORY */
+.hist-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.hist-hd h3{font-size:15px;font-weight:700;}
+.btn-clear{background:none;border:none;font-size:12px;color:var(--t3);cursor:pointer;font-family:'Inter',sans-serif;padding:4px 8px;border-radius:var(--r2);}
+.btn-clear:hover{color:var(--red);}
+.hist-group{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin:14px 0 6px;}
+.hi{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;margin-bottom:6px;transition:box-shadow .15s;}
+.hi:hover{box-shadow:var(--sh2);}
+.hi.mega{border-left:3px solid var(--green);}
+.hi.bad{border-left:3px solid var(--red);}
+.hi-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.hi-meta{font-size:11px;color:var(--t2);}
+.hi-score{font-size:15px;font-weight:800;}
+.empty{text-align:center;padding:48px 16px;color:var(--t3);font-size:13px;line-height:1.8;}
+.empty-ico{font-size:28px;margin-bottom:8px;opacity:.4;}
+
+/* CHAT */
+.chat-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.chat-msgs{padding:14px;min-height:240px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.chat-empty{text-align:center;padding:28px;color:var(--t3);font-size:13px;line-height:1.8;}
+.msg-u{align-self:flex-end;background:var(--green);color:#fff;border-radius:12px 12px 2px 12px;padding:9px 13px;font-size:13px;line-height:1.55;max-width:86%;}
+.msg-a{align-self:flex-start;background:var(--bg);border:1px solid var(--border);border-radius:12px 12px 12px 2px;padding:9px 13px;font-size:13px;line-height:1.55;max-width:86%;}
+.msg-a.thinking{opacity:.55;font-style:italic;}
+.chat-suggs{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-top:1px solid var(--border);}
+.sugg{background:none;border:1px solid var(--border2);border-radius:20px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:'Inter',sans-serif;}
+.sugg:hover{border-color:var(--green);color:var(--green);}
+.chat-bar{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);}
+.chat-bar input{flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r2);font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+.chat-bar input:focus{border-color:var(--green);}
+.chat-send{padding:9px 16px;background:var(--green);color:#fff;border:none;border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.chat-send:hover{background:#14532d;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+.overlay.off{display:none;}
+.modal{background:var(--white);border-radius:var(--r);padding:28px;max-width:440px;width:100%;box-shadow:var(--sh2);}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:8px;}
+.modal p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px;}
+.modal-steps{background:var(--bg);border-radius:var(--r2);padding:12px;margin-bottom:14px;}
+.ms{display:flex;gap:10px;font-size:12px;color:var(--t2);margin-bottom:8px;line-height:1.55;}
+.ms:last-child{margin-bottom:0;}
+.ms-n{width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.modal a{color:var(--green);}
+.api-row{display:flex;gap:8px;margin-bottom:8px;}
+.api-row input{flex:1;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r2);font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+.api-row input:focus{border-color:var(--green);}
+.api-err{font-size:12px;color:var(--red);margin-bottom:8px;display:none;}
+.api-note{font-size:11px;color:var(--t3);line-height:1.6;}
+
+/* SPINNER */
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.compare-bar{text-align:right;margin-top:-8px;margin-bottom:1.25rem;}
-.compare-bar button{padding:7px 16px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.compare-bar button:hover{border-color:var(--accent2);color:var(--accent);}
-.chat-wrap{border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:0;}
-.chat-msgs{padding:1rem;min-height:240px;max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
-.msg-u{align-self:flex-end;background:rgba(212,168,83,0.15);color:var(--accent);border:0.5px solid rgba(212,168,83,0.25);border-radius:var(--r) var(--r) 2px var(--r);padding:9px 13px;font-size:13px;line-height:1.55;max-width:88%;}
-.msg-a{align-self:flex-start;background:var(--bg3);color:var(--t1);border:0.5px solid var(--border);border-radius:var(--r) var(--r) var(--r) 2px;padding:9px 13px;font-size:13px;line-height:1.55;max-width:88%;}
-.msg-thinking{opacity:.55;font-style:italic;}
-.chat-input-row{display:flex;gap:8px;padding:10px;border-top:0.5px solid var(--border);}
-.chat-input-row input{flex:1;padding:9px 13px;border-radius:var(--r2);border:0.5px solid var(--border2);background:var(--bg3);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
-.chat-input-row input:focus{border-color:var(--accent2);}
-.chat-send{padding:9px 16px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#0f0f0e;border:none;border-radius:var(--r2);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;flex-shrink:0;}
-.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 10px;border-top:none;}
-.chat-sugg{font-size:11px;padding:5px 10px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.chat-sugg:hover{border-color:var(--accent2);color:var(--accent);}
-.chat-intro{text-align:center;padding:2rem 1rem;color:var(--t3);font-size:13px;line-height:1.7;}
-.chat-intro-icon{font-size:28px;margin-bottom:8px;opacity:.5;}
 </style>
 </head>
 <body>
 
-<!-- API KEY MODAL -->
-<div class="modal-overlay" id="apiModal">
+<!-- MODAL -->
+<div class="overlay off" id="apiModal">
   <div class="modal">
-    <div class="modal-icon">
-      <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+    <h2>Clé API Anthropic</h2>
+    <p>Une clé API personnelle est requise pour analyser les fiches. Elle est stockée uniquement dans votre navigateur.</p>
+    <div class="modal-steps">
+      <div class="ms"><div class="ms-n">1</div><div>Allez sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> — créez un compte gratuit</div></div>
+      <div class="ms"><div class="ms-n">2</div><div>Cliquez <strong>API Keys → Create Key</strong> et copiez la clé</div></div>
+      <div class="ms"><div class="ms-n">3</div><div>Collez ci-dessous — coût estimé : <strong>0,03 $ – 0,08 $</strong> par analyse</div></div>
     </div>
-    <h2>Clé API Anthropic requise</h2>
-    <p>Pour analyser les fiches immobilières depuis ce site, vous avez besoin d'une clé API Anthropic personnelle. Elle est stockée uniquement dans votre navigateur — jamais sur un serveur.</p>
-    <div class="api-steps">
-      <div class="api-step"><div class="api-step-num">1</div><div>Allez sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> et créez un compte (gratuit)</div></div>
-      <div class="api-step"><div class="api-step-num">2</div><div>Cliquez sur <strong style="color:var(--t1)">API Keys</strong> → <strong style="color:var(--t1)">Create Key</strong> → copiez la clé</div></div>
-      <div class="api-step"><div class="api-step-num">3</div><div>Collez-la ci-dessous — coût estimé : <strong style="color:var(--t1)">0,03 $ à 0,08 $</strong> par analyse</div></div>
+    <div class="api-row">
+      <input type="password" id="apiIn" placeholder="sk-ant-api03-..." autocomplete="off"/>
+      <button class="btn" onclick="saveKey()">Enregistrer</button>
     </div>
-    <div class="api-input-row">
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off"/>
-      <button class="api-save-btn" onclick="saveApiKey()">Enregistrer</button>
-    </div>
-    <div class="api-error" id="apiError">Clé invalide — elle doit commencer par "sk-ant-"</div>
-    <div class="api-note">🔒 Votre clé est sauvegardée dans votre navigateur (localStorage) et n'est jamais transmise à un tiers. Elle va directement de votre navigateur à l'API Anthropic.</div>
+    <div class="api-err" id="apiErr">Clé invalide — doit commencer par "sk-"</div>
+    <div class="api-note">🔒 Sauvegardée localement dans votre navigateur, jamais transmise à un tiers.</div>
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="mainApp" style="display:none;">
+<!-- APP -->
+<div id="app" style="display:none;">
 
-<div style="display:flex;gap:8px;margin-bottom:1.25rem;">
-  <button onclick="showSection('analyzer')" id="nav-analyzer" style="flex:1;padding:9px;border-radius:var(--r2);border:0.5px solid var(--accent2);background:rgba(212,168,83,0.15);color:var(--accent);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Analyser</button>
-  <button onclick="showSection('history')" id="nav-history" style="flex:1;padding:9px;border-radius:var(--r2);border:0.5px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">Historique <span id="hist-count"></span></button>
-  <button onclick="showSection('chat')" id="nav-chat" style="flex:1;padding:9px;border-radius:var(--r2);border:0.5px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">Chat IA</button>
-</div>
-
-<div id="section-analyzer">
-<div class="masthead">
-  <div class="masthead-icon">
-    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <span class="tb-name">Herbie's Houses</span>
   </div>
-  <div class="masthead-text">
-    <h1>Analyseur de fiches immobilières</h1>
-    <p>MRB · Cashflow · Zonage · Valeur marchande · Risques · Négociation</p>
+  <div class="tb-right">
+    <div class="api-dot-wrap"><div class="api-dot"></div><span id="apiHint"></span></div>
+    <button class="btn-ghost" onclick="resetKey()">Changer la clé</button>
   </div>
 </div>
 
-<div class="api-banner">
-  <div class="api-banner-left">
-    <div class="api-dot"></div>
-    <span>API connectée · <span id="apiKeyHint"></span></span>
-  </div>
-  <button onclick="resetApiKey()">Changer de clé</button>
+<div class="nav">
+  <button class="nav-btn on" id="n-analyzer" onclick="goTo('analyzer')">Analyser</button>
+  <button class="nav-btn" id="n-history" onclick="goTo('history')">Historique<span class="nav-badge" id="hBadge" style="display:none;"></span></button>
+  <button class="nav-btn" id="n-chat" onclick="goTo('chat')">Chat IA</button>
 </div>
 
-<div class="rate-strip">
-  <div class="rate-pill"><div class="rpl">Taux variable 5 ans</div><div class="rpv" id="rVar">—</div><div class="rps" id="rVarSrc">Chargement...</div></div>
-  <div class="rate-pill"><div class="rpl">Taux fixe 5 ans</div><div class="rpv" id="rFix">—</div><div class="rps" id="rFixSrc">Chargement...</div></div>
-  <div class="rate-pill"><div class="rpl">Taux préférentiel BdC</div><div class="rpv">4,45%</div><div class="rps">Banque du Canada 2026</div></div>
-  <div class="rate-pill"><div class="rpl">Amortissement</div><div class="rpv">25 ans</div><div class="rps">Règle SCHL standard</div></div>
-</div>
+<!-- ANALYZER -->
+<div class="content" id="s-analyzer">
 
-<div style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.25rem;">
-  <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Paramètres de calcul personnalisés</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-    <div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <label style="font-size:12px;color:var(--t2);">Taux d'intérêt</label>
-        <span style="font-size:14px;font-weight:500;color:var(--accent);" id="tauxDisplay">3.35%</span>
+  <!-- Params -->
+  <div class="card">
+    <div class="params-toggle" onclick="toggleP()">
+      <div class="params-toggle-left">
+        <h3>Paramètres de calcul</h3>
+        <div class="params-pills">
+          <span class="pill" id="pTaux">3.35%</span>
+          <span class="pill" id="pAmort">25 ans</span>
+          <span class="pill" id="pVar" style="background:var(--blue-bg);color:var(--blue);">—</span>
+        </div>
       </div>
-      <input type="range" id="tauxSlider" min="1" max="10" step="0.05" value="3.35" style="width:100%;" oninput="updateParams()"/>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:3px;"><span>1%</span><span>10%</span></div>
+      <span class="params-arrow" id="pArrow">▼</span>
     </div>
-    <div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <label style="font-size:12px;color:var(--t2);">Amortissement</label>
-        <span style="font-size:14px;font-weight:500;color:var(--accent);" id="amortDisplay">25 ans</span>
+    <div class="params-body" id="pBody">
+      <div class="sliders">
+        <div class="slider-row">
+          <label>Taux d'intérêt utilisé<strong id="tdisplay">3.35%</strong></label>
+          <input type="range" id="tSlider" min="1" max="10" step="0.05" value="3.35" oninput="updateP()"/>
+          <div class="range-hints"><span>1%</span><span>10%</span></div>
+        </div>
+        <div class="slider-row">
+          <label>Amortissement<strong id="adisplay">25 ans</strong></label>
+          <input type="range" id="aSlider" min="15" max="30" step="1" value="25" oninput="updateP()"/>
+          <div class="range-hints"><span>15 ans</span><span>30 ans</span></div>
+        </div>
       </div>
-      <input type="range" id="amortSlider" min="15" max="30" step="1" value="25" style="width:100%;" oninput="updateParams()"/>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:3px;"><span>15 ans</span><span>30 ans</span></div>
+      <div class="schl-box">
+        <strong>Mise de fonds :</strong> 5% ≤ 500k$ · 5%+10% sur tranche 500k–999k$ · 20% ≥ 1M$ (non assurable SCHL)<br>
+        <strong>Prime SCHL :</strong> 4,00% si MDF &lt;10% · 3,10% si 10–15% · 2,80% si 15–20% · 0% si ≥ 20% — s'ajoute au montant emprunté
+      </div>
     </div>
   </div>
-  <div style="margin-top:10px;font-size:11px;color:var(--t3);display:flex;gap:16px;flex-wrap:wrap;">
-    <span>Mise de fonds : 5% ≤500k · 5%+10% tranche 500k-999k · 20% ≥1M$ · Prime SCHL : 4% si &lt;10% · 3,1% si 10-15% · 2,8% si 15-20%</span>
+
+  <!-- Upload -->
+  <div class="card">
+    <div class="card-title">Ajouter une fiche</div>
+    <div class="utabs">
+      <button class="utab on" id="ut-url" onclick="setTab('url')">🔗 Lien URL</button>
+      <button class="utab" id="ut-text" onclick="setTab('text')">📋 Texte copié</button>
+      <button class="utab" id="ut-pdf" onclick="setTab('pdf')">📄 PDF</button>
+      <button class="utab" id="ut-image" onclick="setTab('image')">📸 Photo</button>
+    </div>
+
+    <div class="upanel on" id="up-url">
+      <div class="row">
+        <input type="text" id="urlIn" placeholder="https://www.centris.ca/...  ou  duproprio.com/...  ou  remax.ca/..."/>
+        <button class="btn" onclick="addUrl()">Ajouter</button>
+      </div>
+      <div class="hint">Centris bloque souvent les robots → utilisez <strong>Texte copié</strong> (Ctrl+A → Ctrl+C sur la fiche → coller ici).</div>
+    </div>
+
+    <div class="upanel" id="up-text">
+      <input type="text" id="txtLabel" placeholder="Nom ou adresse (ex: Triplex 695 Egan, Verdun)"/>
+      <textarea id="txtIn" placeholder="Collez ici le texte complet de la fiche. Sur Centris : ouvrez la page → Ctrl+A → Ctrl+C → coller.&#10;&#10;L'agent extrait automatiquement : prix, adresse, revenus, taxes, superficie..."></textarea>
+      <div style="text-align:right;margin-top:8px;"><button class="btn" onclick="addText()">Ajouter</button></div>
+    </div>
+
+    <div class="upanel" id="up-pdf">
+      <div class="dz" id="pdfDz" ondragover="onDg(event,'pdfDz')" ondragleave="offDg('pdfDz')" ondrop="onDrop(event,'pdf')">
+        <input type="file" accept=".pdf,application/pdf" multiple onchange="onFC(event,'pdf')"/>
+        <div class="dz-icon">📄</div>
+        <div class="dz-t">Glissez vos PDF ici ou cliquez pour choisir</div>
+        <div class="dz-s">Fiches Centris exportées, évaluations municipales, rapports d'inspection...</div>
+      </div>
+      <div class="previews" id="pdfPrev"></div>
+    </div>
+
+    <div class="upanel" id="up-image">
+      <div class="dz" id="imgDz" ondragover="onDg(event,'imgDz')" ondragleave="offDg('imgDz')" ondrop="onDrop(event,'image')">
+        <input type="file" accept="image/*" multiple onchange="onFC(event,'image')"/>
+        <div class="dz-icon">📸</div>
+        <div class="dz-t">Glissez vos photos ici ou cliquez pour choisir</div>
+        <div class="dz-s">Photos de fiches, grilles de zonage (RES-3114), captures d'écran...</div>
+      </div>
+      <div class="previews" id="imgPrev"></div>
+    </div>
+
+    <div class="items" id="itemList"></div>
   </div>
+
+  <!-- Analyze -->
+  <div class="analyze-row">
+    <button class="btn" id="analyzeBtn" onclick="analyzeAll()" disabled>Analyser les fiches</button>
+    <div class="progress"><div class="progress-fill" id="pFill"></div></div>
+    <span class="step-txt" id="stepTxt"></span>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="empty"><div class="empty-ico">🏢</div>Ajoutez une fiche via lien, texte, PDF ou photo.<br>L'agent calcule : MRB, cashflow, zonage, risques, négociation.</div>
+  </div>
+
 </div>
 
-<div class="input-card">
-  <label>Ajouter une fiche</label>
-  <div class="tabs">
-    <button class="tab-btn active" id="tb-url" onclick="setTab('url')">
-      <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-      Lien URL
-    </button>
-    <button class="tab-btn" id="tb-text" onclick="setTab('text')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Texte copié
-    </button>
-    <button class="tab-btn" id="tb-pdf" onclick="setTab('pdf')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      PDF
-    </button>
-    <button class="tab-btn" id="tb-image" onclick="setTab('image')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      Photo / Image
-    </button>
-  </div>
-
-  <div class="tab-panel active" id="panel-url">
-    <div class="input-row">
-      <input type="text" id="urlInput" placeholder="https://www.centris.ca/...  ou  remax.ca/...  ou  duproprio.com/..."/>
-      <button class="add-btn" onclick="addUrl()">+ Ajouter</button>
-    </div>
-    <div class="hint">Centris bloque souvent l'accès automatique. Si ça ne fonctionne pas, utilisez <strong>Texte copié</strong> : ouvrez la fiche → Ctrl+A → Ctrl+C → collez ici.</div>
-  </div>
-
-  <div class="tab-panel" id="panel-text">
-    <div class="input-row" style="margin-bottom:8px;">
-      <input type="text" id="textLabel" placeholder="Nom ou adresse (ex: Triplex 695 Egan Verdun)"/>
-    </div>
-    <div class="input-row">
-      <textarea id="textInput" placeholder="Collez ici le texte de la fiche. Sur Centris : ouvrez la page → Ctrl+A → Ctrl+C → coller ici.&#10;&#10;L'agent extrait automatiquement : prix, adresse, revenus, taxes, superficie..."></textarea>
-    </div>
-    <div style="margin-top:8px;text-align:right;">
-      <button class="add-btn" onclick="addText()">+ Ajouter</button>
-    </div>
-  </div>
-
-  <div class="tab-panel" id="panel-pdf">
-    <div class="dropzone" id="pdfDrop" ondragover="onDrag(event,'pdfDrop')" ondragleave="offDrag('pdfDrop')" ondrop="onDrop(event,'pdf')">
-      <input type="file" accept=".pdf,application/pdf" multiple onchange="onFileChange(event,'pdf')"/>
-      <div class="dz-icon">📄</div>
-      <div class="dz-title">Glissez vos PDF ici ou cliquez pour choisir</div>
-      <div class="dz-sub">Fiches Centris exportées, évaluations municipales, rapports d'inspection...</div>
-    </div>
-    <div class="dz-previews" id="pdfPreviews"></div>
-  </div>
-
-  <div class="tab-panel" id="panel-image">
-    <div class="dropzone" id="imgDrop" ondragover="onDrag(event,'imgDrop')" ondragleave="offDrag('imgDrop')" ondrop="onDrop(event,'image')">
-      <input type="file" accept="image/*" multiple onchange="onFileChange(event,'image')"/>
-      <div class="dz-icon">📸</div>
-      <div class="dz-title">Glissez vos photos ici ou cliquez pour choisir</div>
-      <div class="dz-sub">Photos de fiches, grilles de zonage (ex: RES-3114), captures d'écran...</div>
-    </div>
-    <div class="dz-previews" id="imgPreviews"></div>
-  </div>
-
-  <div class="url-chips" id="itemList"></div>
+<!-- HISTORY -->
+<div class="content" id="s-history" style="display:none;">
+  <div class="hist-hd"><h3>Historique des analyses</h3><button class="btn-clear" onclick="clearHist()">Tout effacer</button></div>
+  <div id="histList"><div class="empty"><div class="empty-ico">📋</div>Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici.</div></div>
 </div>
 
-<div class="analyze-wrap">
-  <button class="analyze-btn" id="analyzeBtn" onclick="analyzeAll()" disabled>Analyser les fiches</button>
-  <div class="progress-wrap"><div class="progress-bar" id="pBar"></div></div>
-  <span class="step-lbl" id="stepLbl"></span>
-</div>
-
-<div id="compareBar" style="display:none;" class="compare-bar">
-  <button onclick="compareAll()">Comparer toutes les fiches ↗</button>
-</div>
-
-<div id="results">
-  <div class="empty">
-    <div class="empty-icon">🏢</div>
-    Ajoutez une ou plusieurs fiches — lien, texte, PDF ou photo.<br>
-    L'agent analyse : MRB, cashflow, zonage, valeur marchande, risques et points de négociation.
-  </div>
-</div>
-
-</div><!-- end section-analyzer -->
-
-<div id="section-history" style="display:none;">
-  <div class="hist-bar">
-    <h3>Historique des analyses</h3>
-    <button onclick="clearHistory()">Tout effacer</button>
-  </div>
-  <div id="histList"><div class="empty">Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici automatiquement.</div></div>
-</div>
-
-<div id="section-chat" style="display:none;">
+<!-- CHAT -->
+<div class="content" id="s-chat" style="display:none;">
   <div class="chat-wrap">
     <div class="chat-msgs" id="chatMsgs">
-      <div class="chat-intro">
-        <div class="chat-intro-icon">💬</div>
-        Posez vos questions sur les fiches analysées.<br>
-        <span style="font-size:12px;">Calculs, comparaisons, négociation, zonage...</span>
-      </div>
+      <div class="chat-empty">💬 Posez des questions sur vos fiches analysées.<br><span style="font-size:12px;">Calculs, comparaisons, négociation, zonage...</span></div>
     </div>
-    <div class="chat-suggestions" id="chatSuggs">
-      <button class="chat-sugg" onclick="sendSugg(this)">Quel est le meilleur deal analysé?</button>
-      <button class="chat-sugg" onclick="sendSugg(this)">Si je négocie -10%, quel cashflow?</button>
-      <button class="chat-sugg" onclick="sendSugg(this)">Explique le MRB simplement</button>
-      <button class="chat-sugg" onclick="sendSugg(this)">Quels risques dois-je vérifier?</button>
+    <div class="chat-suggs" id="chatSuggs">
+      <button class="sugg" onclick="qSugg(this)">Quel est le meilleur deal?</button>
+      <button class="sugg" onclick="qSugg(this)">Si je négocie -10%, quel cashflow?</button>
+      <button class="sugg" onclick="qSugg(this)">Explique le MRB simplement</button>
+      <button class="sugg" onclick="qSugg(this)">Quels risques vérifier?</button>
     </div>
-    <div class="chat-input-row">
-      <input type="text" id="chatInput" placeholder="Ex: Si j'achète à 650k$, quel serait le cashflow?" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <div class="chat-bar">
+      <input type="text" id="chatIn" placeholder="Ex: Si j'offre 650k$, quel serait le cashflow?" onkeydown="if(event.key==='Enter')sendChat()"/>
       <button class="chat-send" onclick="sendChat()">Envoyer</button>
     </div>
   </div>
 </div>
 
-</div><!-- end mainApp -->
+</div><!-- end app -->
 
 <script>
-// ── API Key Management ────────────────────────────────────────────────────────
-const API_KEY_STORE = 'hh_api_key';
-let API_KEY = '';
+// PDF.js
+if(!window._pdfjs){window._pdfjs=true;const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';};document.head.appendChild(s);}
 
-function getStoredKey() {
-  try { return localStorage.getItem(API_KEY_STORE) || ''; } catch(e) { return ''; }
+// State
+let API_KEY='',rateData=null,customTaux=3.35,customAmort=25;
+const items=[],results=[];let chatHistory=[];
+
+// API Key
+const KS='hh_api_key';
+function getK(){try{return localStorage.getItem(KS)||'';}catch(e){return '';}}
+function setK(k){try{localStorage.setItem(KS,k);}catch(e){}}
+function saveKey(){
+  const k=document.getElementById('apiIn').value.trim();
+  if(!k.startsWith('sk-')){document.getElementById('apiErr').style.display='block';return;}
+  document.getElementById('apiErr').style.display='none';
+  setK(k);API_KEY=k;showApp();
 }
-function storeKey(k) {
-  try { localStorage.setItem(API_KEY_STORE, k); } catch(e) {}
+function resetKey(){try{localStorage.removeItem(KS);}catch(e){}API_KEY='';document.getElementById('apiIn').value='';document.getElementById('apiModal').classList.remove('off');document.getElementById('app').style.display='none';}
+function showApp(){
+  document.getElementById('apiModal').classList.add('off');
+  document.getElementById('app').style.display='block';
+  document.getElementById('apiHint').textContent=API_KEY.slice(0,10)+'...'+API_KEY.slice(-4);
+  loadRates().then(r=>{if(r?.vn){customTaux=r.vn;document.getElementById('tSlider').value=r.vn;updateP();}});
+  updateBadge();
+  // Bookmarklet param
+  const p=new URLSearchParams(window.location.search).get('fiche');
+  if(p){const t=decodeURIComponent(p);items.push({type:'text',text:t,label:t.split('\n')[0].replace('URL: ','').slice(0,60)||'Fiche'});renderItems();updBtn();window.history.replaceState({},'',location.pathname);setTimeout(()=>document.getElementById('analyzeBtn').scrollIntoView({behavior:'smooth'}),500);}
 }
-function saveApiKey() {
-  const k = document.getElementById('apiKeyInput').value.trim();
-  if (!k.startsWith('sk-ant-') && !k.startsWith('sk-')) {
-    document.getElementById('apiError').style.display = 'block';
-    return;
-  }
-  document.getElementById('apiError').style.display = 'none';
-  storeKey(k);
-  API_KEY = k;
-  showApp();
+document.getElementById('apiIn').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+window.addEventListener('DOMContentLoaded',()=>{const k=getK();if(k){API_KEY=k;showApp();}else{document.getElementById('apiModal').classList.remove('off');}});
+
+// API
+async function callAPI(body){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'Erreur API '+r.status);}
+  return r.json();
 }
-function resetApiKey() {
-  try { localStorage.removeItem(API_KEY_STORE); } catch(e) {}
-  API_KEY = '';
-  document.getElementById('apiKeyInput').value = '';
-  document.getElementById('apiModal').classList.remove('hidden');
-  document.getElementById('mainApp').style.display = 'none';
-}
-function showApp() {
-  document.getElementById('apiModal').classList.add('hidden');
-  document.getElementById('mainApp').style.display = 'block';
-  const hint = API_KEY.slice(0,10) + '...' + API_KEY.slice(-4);
-  document.getElementById('apiKeyHint').textContent = hint;
-  loadRates().then(r => {
-    if(r && r.vn) {
-      customTaux = r.vn;
-      document.getElementById('tauxSlider').value = r.vn;
-      document.getElementById('tauxDisplay').textContent = r.vn.toFixed(2) + '%';
-    }
+
+// Nav
+function goTo(s){
+  ['analyzer','history','chat'].forEach(x=>{
+    document.getElementById('s-'+x).style.display=x===s?'block':'none';
+    document.getElementById('n-'+x).classList.toggle('on',x===s);
   });
-  updateHistCount();
-  // Check if a fiche was passed via URL param (from bookmarklet)
-  const params = new URLSearchParams(window.location.search);
-  const ficheParam = params.get('fiche');
-  if (ficheParam) {
-    const text = decodeURIComponent(ficheParam);
-    const label = text.split('\n')[0].replace('URL: ','').slice(0,60) || 'Fiche Centris';
-    items.push({type:'text', text, label});
-    renderItems(); updateBtn();
-    // Clean URL without reload
-    window.history.replaceState({}, '', window.location.pathname);
-    // Auto-scroll to analyze button
-    setTimeout(() => {
-      document.getElementById('analyzeBtn').scrollIntoView({behavior:'smooth'});
-    }, 500);
-  }
-}
-document.getElementById('apiKeyInput').addEventListener('keydown', e => { if (e.key==='Enter') saveApiKey(); });
-
-// Init
-window.addEventListener('DOMContentLoaded', () => {
-  const k = getStoredKey();
-  if (k) { API_KEY = k; showApp(); }
-  else { document.getElementById('apiModal').classList.remove('hidden'); }
-});
-
-// ── API Call helper ───────────────────────────────────────────────────────────
-async function callAPI(body) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || 'Erreur API ' + res.status);
-  }
-  return res.json();
+  if(s==='history')renderHist();
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-function setTab(t) {
-  ['url','text','pdf','image'].forEach(x => {
-    document.getElementById('panel-'+x).classList.toggle('active', x===t);
-    document.getElementById('tb-'+x).classList.toggle('active', x===t);
-  });
+// Params
+function toggleP(){const b=document.getElementById('pBody'),a=document.getElementById('pArrow');b.classList.toggle('open');a.classList.toggle('open');}
+function updateP(){
+  customTaux=parseFloat(document.getElementById('tSlider').value);
+  customAmort=parseInt(document.getElementById('aSlider').value);
+  document.getElementById('tdisplay').textContent=customTaux.toFixed(2)+'%';
+  document.getElementById('adisplay').textContent=customAmort+' ans';
+  document.getElementById('pTaux').textContent=customTaux.toFixed(2)+'%';
+  document.getElementById('pAmort').textContent=customAmort+' ans';
 }
 
-// ── Files ─────────────────────────────────────────────────────────────────────
-const items = [];
-let rateData = null;
-let results = [];
-
-function onDrag(e,id){e.preventDefault();document.getElementById(id).classList.add('drag-over');}
-function offDrag(id){document.getElementById(id).classList.remove('drag-over');}
-function onDrop(e,kind){e.preventDefault();offDrag(kind==='pdf'?'pdfDrop':'imgDrop');handleFiles([...e.dataTransfer.files],kind);}
-function onFileChange(e,kind){handleFiles([...e.target.files],kind);e.target.value='';}
-
-// Load PDF.js from CDN
-if (!window._pdfJsLoaded) {
-  window._pdfJsLoaded = true;
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-  s.onload = () => { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; };
-  document.head.appendChild(s);
-}
-
-function compressImage(dataUrl, maxWidth, quality, callback) {
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    let w = img.width, h = img.height;
-    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    callback(canvas.toDataURL('image/jpeg', quality).split(',')[1]);
-  };
-  img.src = dataUrl;
-}
-
-async function extractPDFText(dataUrl, filename) {
-  try {
-    const base64 = dataUrl.split(',')[1];
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-
-    const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
-    const totalPages = pdf.numPages;
-    let fullText = '';
-
-    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map(item => item.str).join(' ');
-      fullText += `--- Page ${pageNum} ---\n${pageText}\n\n`;
-    }
-
-    // Clean up: remove excessive whitespace
-    fullText = fullText.replace(/\s{3,}/g, '  ').trim();
-
-    items.push({
-      type: 'pdf_text',
-      label: filename + ` (${totalPages} pages · texte extrait)`,
-      text: fullText,
-      filename
-    });
-    renderItems(); updateBtn();
-
-  } catch(e) {
-    console.warn('PDF text extraction failed:', e);
-    // Fallback to raw base64
-    const base64 = dataUrl.split(',')[1];
-    items.push({type:'pdf', label:filename, base64, mediaType:'application/pdf'});
-    renderItems(); updateBtn();
-  }
-}
-
-function handleFiles(files, kind) {
-  files.forEach(file => {
-    const isPdf = kind==='pdf'||file.type==='application/pdf';
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const dataUrl = ev.target.result;
-      if (!isPdf) {
-        compressImage(dataUrl, 1200, 0.72, base64 => {
-          items.push({type:'image', label:file.name, base64, mediaType:'image/jpeg'});
-          renderItems(); updateBtn();
-        });
-      } else {
-        extractPDFText(dataUrl, file.name);
-      }
-    };
-    reader.readAsDataURL(file);
-    // Preview
-    const container = document.getElementById(kind==='pdf'?'pdfPreviews':'imgPreviews');
-    const div = document.createElement('div');
-    div.className = 'dz-preview';
-    if (kind==='image') {
-      const img = document.createElement('img');
-      img.className = 'dz-preview-thumb';
-      img.src = URL.createObjectURL(file);
-      div.appendChild(img);
-    } else {
-      const ic = document.createElement('div');
-      ic.className = 'dz-preview-thumb pdf-thumb';
-      ic.textContent = '📄';
-      div.appendChild(ic);
-    }
-    const nm = document.createElement('span');
-    nm.textContent = file.name.slice(0,30)+(file.name.length>30?'…':'');
-    div.appendChild(nm);
-    container.appendChild(div);
-  });
-}
-
-function addUrl() {
-  let v = document.getElementById('urlInput').value.trim();
-  if (!v) return;
-  if (!v.startsWith('http')) v='https://'+v;
-  if (items.find(i=>i.url===v)) return;
-  items.push({type:'url',url:v,label:v.replace(/https?:\/\/(www\.)?/,'').slice(0,55)});
-  document.getElementById('urlInput').value='';
-  renderItems(); updateBtn();
-}
-document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')addUrl();});
-
-function addText() {
-  const t=document.getElementById('textInput').value.trim();
-  const lbl=document.getElementById('textLabel').value.trim();
-  if(!t)return;
-  items.push({type:'text',text:t,label:lbl||'Fiche #'+(items.length+1)});
-  document.getElementById('textInput').value='';
-  document.getElementById('textLabel').value='';
-  renderItems(); updateBtn();
-}
-
-function removeItem(i){items.splice(i,1);renderItems();updateBtn();}
-function renderItems(){
-  const l=document.getElementById('itemList');
-  if(!items.length){l.innerHTML='';return;}
-  const icons={url:'🔗',text:'📋',pdf:'📄',image:'📸'};
-  l.innerHTML=items.map((it,i)=>`<div class="url-chip"><span>${icons[it.type]||'📎'} ${it.label}</span><button onclick="removeItem(${i})">✕</button></div>`).join('');
-}
-function updateBtn(){document.getElementById('analyzeBtn').disabled=items.length===0;}
-
-// ── Rates ────────────────────────────────────────────────────────────────────
-const RKEY='hh_r6';
+// Rates
+const RK='hh_r8';
 async function loadRates(){
-  try{const c=sessionStorage.getItem(RKEY);if(c){const p=JSON.parse(c);if(Date.now()-p.ts<3600000){applyRates(p.d);return p.d;}}}catch(e){}
+  try{const c=sessionStorage.getItem(RK);if(c){const p=JSON.parse(c);if(Date.now()-p.ts<3600000){applyR(p.d);return p.d;}}}catch(e){}
   try{
-    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:200,system:'Taux hypothécaires Québec. JSON: {"variable":"3.35%","fixe":"3.94%","source":"ratehub.ca","vn":3.35,"fn":3.94}',messages:[{role:'user',content:'Meilleurs taux variable et fixe 5 ans Québec aujourd\'hui.'}],tools:[{type:'web_search_20250305',name:'web_search'}]});
+    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:200,system:'Taux hypothécaires Québec. JSON uniquement: {"variable":"3.35%","fixe":"3.94%","source":"ratehub.ca","vn":3.35,"fn":3.94}',messages:[{role:'user',content:"Meilleurs taux variable et fixe 5 ans Québec aujourd'hui."}],tools:[{type:'web_search_20250305',name:'web_search'}]});
     const t=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
     const r=parseJ(t)||{variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};
-    sessionStorage.setItem(RKEY,JSON.stringify({ts:Date.now(),d:r}));
-    applyRates(r);return r;
-  }catch(e){const r={variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};applyRates(r);return r;}
+    sessionStorage.setItem(RK,JSON.stringify({ts:Date.now(),d:r}));
+    applyR(r);return r;
+  }catch(e){const r={variable:'3.35%',fixe:'3.94%',source:'Estimation',vn:3.35,fn:3.94};applyR(r);return r;}
 }
-function applyRates(r){
+function applyR(r){
   rateData=r;
-  document.getElementById('rVar').textContent=r.variable;
-  document.getElementById('rFix').textContent=r.fixe;
-  document.getElementById('rVarSrc').textContent=r.source||'Mis à jour';
-  document.getElementById('rFixSrc').textContent=r.source||'Mis à jour';
+  document.getElementById('pVar').textContent='Var '+r.variable+' · Fix '+r.fixe;
+  if(r.vn&&!document.getElementById('tSlider')._set){document.getElementById('tSlider').value=r.vn;document.getElementById('tSlider')._set=true;updateP();}
 }
 
-// ── Calcs ────────────────────────────────────────────────────────────────────
-// Custom calculation params (updated by sliders)
-let customTaux = 3.35;
-let customAmort = 25;
-
-function updateParams() {
-  customTaux = parseFloat(document.getElementById('tauxSlider').value);
-  customAmort = parseInt(document.getElementById('amortSlider').value);
-  document.getElementById('tauxDisplay').textContent = customTaux.toFixed(2) + '%';
-  document.getElementById('amortDisplay').textContent = customAmort + ' ans';
-}
-
+// Calc
 function calcMDF(p){
   let mdf,pct;
   if(p<=500000){pct=5;mdf=Math.round(p*.05);}
   else if(p<1000000){mdf=Math.round(25000+(p-500000)*.10);pct=parseFloat((mdf/p*100).toFixed(1));}
   else{pct=20;mdf=Math.round(p*.20);}
-  const mdfPct=mdf/p*100;
-  let prime=0,primePct=0;
-  if(mdfPct<20){
-    if(mdfPct<10)primePct=4.00;
-    else if(mdfPct<15)primePct=3.10;
-    else primePct=2.80;
-    prime=Math.round((p-mdf)*primePct/100);
-  }
-  return{pct,val:mdf,prime,primePct,pretAvecPrime:(p-mdf)+prime};
+  const mdfPct=mdf/p*100;let prime=0,primePct=0;
+  if(mdfPct<20){if(mdfPct<10)primePct=4.00;else if(mdfPct<15)primePct=3.10;else primePct=2.80;prime=Math.round((p-mdf)*primePct/100);}
+  return{pct,val:mdf,prime,primePct,net:(p-mdf)+prime};
 }
 function calcVers(m,ta,mo){const r=ta/100/12;if(r===0)return m/mo;return m*r*Math.pow(1+r,mo)/(Math.pow(1+r,mo)-1);}
 function calcFin(prix,revA,taux,taxA){
-  const mois=customAmort*12;
-  const mdf=calcMDF(prix);
-  const v=calcVers(mdf.pretAvecPrime,taux,mois);
+  const mo=customAmort*12,mdf=calcMDF(prix),v=calcVers(mdf.net,taux,mo);
   const tx=taxA?taxA/12:(prix*.01)/12,ch=(revA/12)*.32,rev=revA/12,cf=Math.round(rev-v-tx-ch);
-  return{mdf:mdf.val,mdfPct:mdf.pct,prime:mdf.prime,primePct:mdf.primePct,pretTotal:mdf.pretAvecPrime,vers:Math.round(v),cf,mrb:revA>0?Math.round(prix/revA*10)/10:null,rend:mdf.val>0&&revA>0?Math.round(cf*12/mdf.val*1000)/10:0};
+  return{mdf:mdf.val,mdfPct:mdf.pct,prime:mdf.prime,primePct:mdf.primePct,pretTotal:mdf.net,vers:Math.round(v),cf,mrb:revA>0?Math.round(prix/revA*10)/10:null,rend:mdf.val>0&&revA>0?Math.round(cf*12/mdf.val*1000)/10:0};
 }
 
-// ── Analyze ──────────────────────────────────────────────────────────────────
-const SYS=`Tu es un expert en investissement immobilier au Québec. Analyse la fiche immobilière fournie.
+// Tabs
+function setTab(t){['url','text','pdf','image'].forEach(x=>{document.getElementById('up-'+x).classList.toggle('on',x===t);document.getElementById('ut-'+x).classList.toggle('on',x===t);});}
 
-CALCULS: MRB=Prix/Revenus bruts annuels. Versement avec taux variable fourni, mise de fonds SCHL minimale, amortissement 25 ans. Cashflow=Revenus-(Versement+Taxes+Charges 32%). Rendement=Cashflow annuel/Mise de fonds.
+// Files
+function onDg(e,id){e.preventDefault();document.getElementById(id).classList.add('over');}
+function offDg(id){document.getElementById(id).classList.remove('over');}
+function onDrop(e,k){e.preventDefault();offDg(k==='pdf'?'pdfDz':'imgDz');handleFiles([...e.dataTransfer.files],k);}
+function onFC(e,k){handleFiles([...e.target.files],k);e.target.value='';}
+function compressImg(du,mw,q,cb){const i=new Image();i.onload=()=>{const c=document.createElement('canvas');let w=i.width,h=i.height;if(w>mw){h=Math.round(h*mw/w);w=mw;}c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);cb(c.toDataURL('image/jpeg',q).split(',')[1]);};i.src=du;}
+async function extractPDF(du,fn){
+  try{
+    const b64=du.split(',')[1],bin=atob(b64),bytes=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+    const pdf=await pdfjsLib.getDocument({data:bytes}).promise;
+    let txt='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const tc=await pg.getTextContent();txt+=`--- Page ${i} ---\n${tc.items.map(x=>x.str).join(' ')}\n\n`;}
+    txt=txt.replace(/\s{3,}/g,'  ').trim();
+    items.push({type:'pdf_text',label:fn+` (${pdf.numPages} pages · texte extrait)`,text:txt});
+    renderItems();updBtn();
+  }catch(e){const base64=du.split(',')[1];items.push({type:'pdf',label:fn,base64,mediaType:'application/pdf'});renderItems();updBtn();}
+}
+function handleFiles(files,kind){
+  files.forEach(f=>{
+    const isPdf=kind==='pdf'||f.type==='application/pdf';
+    const r=new FileReader();
+    r.onload=ev=>{const du=ev.target.result;if(!isPdf){compressImg(du,1200,.72,b64=>{items.push({type:'image',label:f.name,base64:b64,mediaType:'image/jpeg'});renderItems();updBtn();});}else{extractPDF(du,f.name);}};
+    r.readAsDataURL(f);
+    const c=document.getElementById(isPdf?'pdfPrev':'imgPrev');
+    const ch=document.createElement('div');ch.className='prev-chip';ch.textContent=(isPdf?'📄 ':'📸 ')+f.name.slice(0,25)+(f.name.length>25?'…':'');c.appendChild(ch);
+  });
+}
+function addUrl(){let v=document.getElementById('urlIn').value.trim();if(!v)return;if(!v.startsWith('http'))v='https://'+v;if(items.find(i=>i.url===v))return;items.push({type:'url',url:v,label:v.replace(/https?:\/\/(www\.)?/,'').slice(0,55)});document.getElementById('urlIn').value='';renderItems();updBtn();}
+document.getElementById('urlIn').addEventListener('keydown',e=>{if(e.key==='Enter')addUrl();});
+function addText(){const t=document.getElementById('txtIn').value.trim(),l=document.getElementById('txtLabel').value.trim();if(!t)return;items.push({type:'text',text:t,label:l||'Fiche #'+(items.length+1)});document.getElementById('txtIn').value='';document.getElementById('txtLabel').value='';renderItems();updBtn();}
+function removeItem(i){items.splice(i,1);renderItems();updBtn();}
+function renderItems(){
+  const l=document.getElementById('itemList');if(!items.length){l.innerHTML='';return;}
+  const ic={url:'🔗',text:'📋',pdf:'📄',pdf_text:'📄',image:'📸'};
+  l.innerHTML=items.map((it,i)=>`<div class="item"><span>${ic[it.type]||'📎'} ${it.label}</span><button onclick="removeItem(${i})">✕</button></div>`).join('');
+}
+function updBtn(){document.getElementById('analyzeBtn').disabled=items.length===0;}
+
+// System prompt
+const SYS=`Tu es un expert en investissement immobilier au Québec. Analyse la fiche fournie.
+
+CALCULS: MRB=Prix/Revenus bruts annuels. Versement calculé sur (prêt + prime SCHL), taux et amortissement fournis.
+Cashflow=Revenus/mois − (Versement + Taxes/mois + Charges 32%). Rendement=Cashflow annuel/Mise de fonds.
 
 SCHL: 5% ≤500k | 5%+10% tranche 500k-999k | 20% ≥1M$
-PRIME SCHL (s'ajoute au prêt): MDF<10%→4.00% | MDF 10-15%→3.10% | MDF 15-20%→2.80% | MDF≥20%→0%
-Versement = calculé sur (prêt + prime SCHL)
+PRIME SCHL (s'ajoute au prêt): MDF<10%→4.00% | 10-15%→3.10% | 15-20%→2.80% | ≥20%→0%
 
 SCORE/10: MRB≤8:+3|MRB≤10:+2|Cashflow+:+3|Cashflow>-300:+1|Prix<marché:+2|Subdivision:+2. Score≥7=MÉGA DEAL.
 
-RECHERCHES: 1) Zonage municipal de l'adresse (site de la ville) 2) Ventes comparables récentes.
+RECHERCHES: 1) Zonage municipal 2) Ventes comparables récentes.
 
-JSON UNIQUEMENT:
-{"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","zonage_description":"","logements_max_permis":0,"score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
+JSON UNIQUEMENT (pas de texte avant ou après):
+{"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"prime_schl":0,"prime_schl_pct":0,"pret_total":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","logements_max_permis":0,"score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
 
 async function analyzeFiche(item,rate){
   const taux=customTaux||rate.vn||3.35;
-  const sys=SYS+`\n\nTaux du jour: variable=${rate.variable}, fixe=${rate.fixe} (utilise ${taux}% pour calculs)\nAmortissement: 25 ans`;
-  let userContent;
-  if(item.type==='url') userContent=[{type:'text',text:'Analyse cette fiche: '+item.url}];
-  else if(item.type==='text') userContent=[{type:'text',text:'Analyse cette fiche:\n\n'+item.text}];
-  else if(item.type==='pdf') userContent=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:item.base64}},{type:'text',text:'Analyse complète de ce PDF immobilier.'}];
-  else if(item.type==='pdf_text') {
-    userContent=[{type:'text',text:`Analyse complète de cette fiche immobilière. Voici le texte extrait du PDF:\n\n${item.text}`}];
-  }
-  else if(item.type==='pdf_pages') {
-    const pagesToSend = item.pages.slice(0, 3);
-    userContent = pagesToSend.map(p=>({type:'image',source:{type:'base64',media_type:'image/jpeg',data:p}}));
-    userContent.push({type:'text',text:`Analyse complète de cette fiche immobilière PDF (${pagesToSend.length} pages).`});
-  }
-  else userContent=[{type:'image',source:{type:'base64',media_type:item.mediaType||'image/jpeg',data:item.base64}},{type:'text',text:'Analyse complète de cette fiche immobilière (image). Extrais toutes les données visibles.'}];
-
-  const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:userContent}],tools:[{type:'web_search_20250305',name:'web_search'}]});
+  const sys=SYS+`\n\nTaux: variable=${rate.variable}, fixe=${rate.fixe}, utilise ${taux}% | Amortissement: ${customAmort} ans`;
+  let uc;
+  if(item.type==='url')uc=[{type:'text',text:'Analyse: '+item.url}];
+  else if(item.type==='text'||item.type==='pdf_text')uc=[{type:'text',text:'Analyse cette fiche:\n\n'+item.text}];
+  else if(item.type==='pdf')uc=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:item.base64}},{type:'text',text:'Analyse complète.'}];
+  else uc=[{type:'image',source:{type:'base64',media_type:item.mediaType||'image/jpeg',data:item.base64}},{type:'text',text:'Analyse complète. Extrais toutes les données visibles.'}];
+  const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:uc}],tools:[{type:'web_search_20250305',name:'web_search'}]});
   const f=parseJ((d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''));
   if(!f)return null;
   if(f.prix&&f.revenus_bruts_annuels){
     const c=calcFin(f.prix,f.revenus_bruts_annuels,taux,f.taxes_annuelles);
     if(!f.mrb)f.mrb=c.mrb;
     if(!f.mise_fonds_min){f.mise_fonds_min=c.mdf;f.mise_fonds_pct=c.mdfPct;}
+    if(!f.prime_schl){f.prime_schl=c.prime;f.prime_schl_pct=c.primePct;}
+    if(!f.pret_total)f.pret_total=c.pretTotal;
     if(!f.versement_mensuel)f.versement_mensuel=c.vers;
     if(!f.cashflow_mensuel)f.cashflow_mensuel=c.cf;
     if(!f.rendement_mise_fonds_pct)f.rendement_mise_fonds_pct=c.rend;
@@ -720,303 +569,127 @@ async function analyzeFiche(item,rate){
 
 async function analyzeAll(){
   if(!items.length)return;
-  const btn=document.getElementById('analyzeBtn');
-  btn.disabled=true;results=[];
+  const btn=document.getElementById('analyzeBtn');btn.disabled=true;results.length=0;
   document.getElementById('results').innerHTML='';
-  document.getElementById('compareBar').style.display='none';
-  setProgress(5,'Taux du jour...');
+  setP(5,'Taux du jour...');
   const rate=await loadRates();
   for(let i=0;i<items.length;i++){
-    setProgress(Math.round(10+(i/items.length)*85),`Fiche ${i+1}/${items.length}...`);
-    const lid='ld_'+i;
-    const lDiv=document.createElement('div');
-    lDiv.id=lid;lDiv.className='report';
-    lDiv.innerHTML=`<div class="report-head"><div><div class="report-title"><span class="spinner"></span>Analyse en cours...</div><div class="report-addr">${items[i].label}</div></div></div>`;
-    document.getElementById('results').appendChild(lDiv);
+    setP(Math.round(10+(i/items.length)*85),`Fiche ${i+1}/${items.length}...`);
+    const lid='ld'+i;const div=document.createElement('div');div.id=lid;div.className='res-card';
+    div.innerHTML=`<div class="res-head"><div class="res-hl"><div class="res-title"><span class="spinner"></span>Analyse en cours...</div><div class="res-addr">${items[i].label}</div></div></div>`;
+    document.getElementById('results').appendChild(div);
     try{
       const f=await analyzeFiche(items[i],rate);
-      if(f){f._src=items[i].label;results.push(f);document.getElementById(lid).outerHTML=renderCard(f);saveToHistory(f);}
-      else document.getElementById(lid).outerHTML=`<div class="report"><div class="empty">Impossible d'analyser. Essayez l'onglet "Texte copié".</div></div>`;
-    }catch(e){
-      document.getElementById(lid).outerHTML=`<div class="report"><div class="empty">Erreur: ${e.message}<br><br>Si votre clé API est incorrecte, cliquez "Changer de clé" en haut.</div></div>`;
-    }
+      if(f){f._src=items[i].label;results.push(f);document.getElementById(lid).outerHTML=renderCard(f);saveHist(f);}
+      else document.getElementById(lid).outerHTML=`<div class="res-card"><div class="empty">Impossible d'analyser. Essayez l'onglet Texte copié.</div></div>`;
+    }catch(e){document.getElementById(lid).outerHTML=`<div class="res-card"><div class="empty" style="color:var(--red)">Erreur : ${e.message}</div></div>`;}
   }
-  setProgress(100,'');setTimeout(()=>setProgress(0,''),1500);
-  btn.disabled=false;
-  if(results.length>1)document.getElementById('compareBar').style.display='block';
+  setP(100,'');setTimeout(()=>setP(0,''),1400);btn.disabled=false;
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
-function parseJ(t){
-  if(!t)return null;
-  // Remove markdown code blocks
-  let s = t.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-  // Try direct parse first
-  try{return JSON.parse(s);}catch(e){}
-  // Try to extract JSON object from text
-  const start = s.indexOf('{');
-  const end = s.lastIndexOf('}');
-  if(start>=0 && end>start){
-    try{return JSON.parse(s.slice(start, end+1));}catch(e){}
-  }
-  return null;
-}
+// Helpers
+function parseJ(t){if(!t)return null;let s=t.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();try{return JSON.parse(s);}catch(e){}const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a){try{return JSON.parse(s.slice(a,b+1));}catch(e){}}return null;}
 function fmt(n){return n?n.toLocaleString('fr-CA')+'\u202f$':'N/A';}
 function fmtK(n){return n?(n/1000).toFixed(0)+'k\u202f$':'N/A';}
-function setProgress(pct,lbl){document.getElementById('pBar').style.width=pct+'%';document.getElementById('stepLbl').textContent=lbl||'';}
-function rColor(s){return s>=7?'var(--accent)':s>=5?'var(--green)':'var(--t3)';}
-function rOffset(s){return 132-(s/10)*132;}
+function setP(p,l){document.getElementById('pFill').style.width=p+'%';document.getElementById('stepTxt').textContent=l||'';}
 
 function renderCard(f){
   const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel;
-  const cfC=cf>0?'g':cf<0?'b':'w';
-  const cfL=(cf!==undefined&&cf!==null)?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'N/A';
-  const isMega=sc>=7;
+  const isMega=sc>=7,isBad=sc<=3;
+  const cfStr=cf!=null?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'N/A';
+  const cfCls=cf>0?'g':cf<0?'r':'a';
   const ecart=f.eval_municipale&&f.prix?Math.round((f.prix-f.eval_municipale)/f.eval_municipale*100):null;
-  const flags=(f.flags||[]).map(fl=>{const l=fl.toLowerCase();if(l.includes('cashflow'))return`<span class="flag cf">${fl}</span>`;if(l.includes('mrb')||l.includes('valeur')||l.includes('prix'))return`<span class="flag hot">${fl}</span>`;if(l.includes('subdivision')||l.includes('zonage')||l.includes('terrain'))return`<span class="flag sub">${fl}</span>`;if(l.includes('risque')||l.includes('garantie'))return`<span class="flag risk">${fl}</span>`;return`<span class="flag def">${fl}</span>`;}).join('');
-  const risques=(f.risques||[]).map(r=>`<div class="list-item"><span style="color:var(--red);flex-shrink:0;">⚠</span><span>${r}</span></div>`).join('');
-  const nego=(f.points_negociation||[]).map(n=>`<div class="list-item"><span style="color:var(--accent);flex-shrink:0;">—</span><span>${n}</span></div>`).join('');
-  const chars=(f.caracteristiques||[]).slice(0,8).map(c=>`<span class="flag def">${c}</span>`).join('');
-  const zoning=f.zonage_code?`<div class="zoning-badge"><span>Zone</span><span class="zone-code">${f.zonage_code}</span>${f.logements_max_permis?`<span>· max <strong>${f.logements_max_permis}</strong> logements</span>`:''}</div>`:'';
-
-  return`<div class="report${isMega?' mega':''}">
-    <div class="report-head">
-      <div style="flex:1;min-width:0;">
-        ${isMega?'<div class="mega-label">★ Méga deal</div>':''}
-        <div class="report-title">${f.titre||'Propriété analysée'}</div>
-        <div class="report-addr">${[f.adresse,f.ville,f.type,f.nb_logements?f.nb_logements+' logements':'',f.annee_construction?'Construit '+f.annee_construction:''].filter(Boolean).join(' · ')}</div>
-        <div class="report-src">${f._src||''}</div>
-        ${zoning}
-      </div>
-      <div class="score-ring">
-        <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="21" fill="none" stroke="var(--bg4)" stroke-width="4"/><circle cx="26" cy="26" r="21" fill="none" stroke="${rColor(sc)}" stroke-width="4" stroke-dasharray="132" stroke-dashoffset="${rOffset(sc)}" stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:center;"/></svg>
-        <div class="score-num" style="color:${rColor(sc)}">${sc}<div class="score-denom">/10</div></div>
-      </div>
+  const sColor=isMega?'var(--green)':isBad?'var(--red)':'var(--amber)';
+  const sBg=isMega?'var(--green-bg)':isBad?'var(--red-bg)':'var(--amber-bg)';
+  const badge=isMega?`<div class="res-badge mega">★ Méga deal</div>`:isBad?`<div class="res-badge bad">⚠ Deal à éviter</div>`:'';
+  const zone=f.zonage_code?`<div class="res-zone">📍 ${f.zonage_code}${f.logements_max_permis?` · max ${f.logements_max_permis} log.`:''}</div>`:'';
+  const risques=(f.risques||[]).map(r=>`<div class="list-item"><span class="li-icon" style="color:var(--red)">⚠</span><span>${r}</span></div>`).join('');
+  const nego=(f.points_negociation||[]).map(n=>`<div class="list-item"><span class="li-icon" style="color:var(--amber)">→</span><span>${n}</span></div>`).join('');
+  const chars=(f.caracteristiques||[]).slice(0,8).map(c=>`<span class="tag neutral">${c}</span>`).join('');
+  return`<div class="res-card${isMega?' mega':isBad?' bad':''}">
+  <div class="res-head">
+    <div class="res-hl">
+      ${badge}
+      <div class="res-title">${f.titre||'Propriété analysée'}</div>
+      <div class="res-addr">${[f.adresse,f.ville,f.type,f.nb_logements?f.nb_logements+' log.':'',f.annee_construction?f.annee_construction+'':''].filter(Boolean).join(' · ')}</div>
+      ${zone}
     </div>
-    <div class="report-body">
-      <div class="section">
-        <div class="section-title">Financier</div>
-        <div class="kv"><span class="kk">Prix demandé</span><span class="kv-val a">${fmt(f.prix)}</span></div>
-        ${f.eval_municipale?`<div class="kv"><span class="kk">Évaluation municipale</span><span class="kv-val">${fmt(f.eval_municipale)}</span></div>`:''}
-        ${ecart!==null?`<div class="kv"><span class="kk">Écart prix/éval.</span><span class="kv-val ${ecart>0?'b':'g'}">${ecart>0?'+':''}${ecart}%</span></div>`:''}
-        ${f.mrb?`<div class="kv"><span class="kk">MRB</span><span class="kv-val ${f.mrb<=10?'g':'b'}">${f.mrb.toFixed(1)}</span></div>`:''}
-        ${f.revenus_bruts_annuels?`<div class="kv"><span class="kk">Revenus bruts</span><span class="kv-val">${fmt(f.revenus_bruts_annuels)}/an</span></div>`:''}
-        ${f.versement_mensuel?`<div class="kv"><span class="kk">Versement hypo.</span><span class="kv-val">${Math.round(f.versement_mensuel).toLocaleString('fr-CA')}\u202f$/mois</span></div>`:''}
-        ${cf!==undefined?`<div class="kv"><span class="kk">Cashflow net</span><span class="kv-val ${cfC}">${cfL}</span></div>`:''}
-        ${f.mise_fonds_min?`<div class="kv"><span class="kk">Mise de fonds min.</span><span class="kv-val">${fmtK(f.mise_fonds_min)} (${f.mise_fonds_pct}%)</span></div>`:''}
-        
-        ${f.prime?`<div class="kv"><span class="kk">Prime SCHL (${f.primePct}%)</span><span class="kv-val w">+${fmtK(f.prime)}</span></div>`:''}
-        ${f.pretTotal?`<div class="kv"><span class="kk">Prêt total avec prime</span><span class="kv-val">${fmt(f.pretTotal)}</span></div>`:''}
-        ${f.rendement_mise_fonds_pct?`<div class="kv"><span class="kk">Rendement/mise</span><span class="kv-val ${f.rendement_mise_fonds_pct>0?'g':'b'}">${f.rendement_mise_fonds_pct}%/an</span></div>`:''}
-        ${f.taxes_annuelles?`<div class="kv"><span class="kk">Taxes annuelles</span><span class="kv-val">${fmt(f.taxes_annuelles)}</span></div>`:''}
-        ${flags?`<div class="flags" style="margin-top:10px;">${flags}</div>`:''}
-      </div>
-      <div class="section">
-        <div class="section-title">Marché &amp; potentiel</div>
-        <div class="kv"><span class="kk">Valeur estimée</span><span class="kv-val ${f.sous_valeur?'g':''}">${f.estimation_valeur_marchande?fmt(f.estimation_valeur_marchande):'—'}</span></div>
-        <div class="kv"><span class="kk">Sous valeur marchande</span><span class="kv-val ${f.sous_valeur?'g':'b'}">${f.sous_valeur?'Oui ✓':'Non'}</span></div>
-        <div class="kv"><span class="kk">Potentiel subdivision</span><span class="kv-val ${f.potentiel_sub?'g':'b'}">${f.potentiel_sub?'Oui ✓':'Non'}</span></div>
-        ${f.zonage_code?`<div class="kv"><span class="kk">Zone</span><span class="kv-val a">${f.zonage_code}</span></div>`:''}
-        ${f.logements_max_permis?`<div class="kv"><span class="kk">Logements max permis</span><span class="kv-val g">${f.logements_max_permis}</span></div>`:''}
-        ${f.superficie_terrain?`<div class="kv"><span class="kk">Terrain</span><span class="kv-val">${f.superficie_terrain}</span></div>`:''}
-        ${f.prix_offre_suggere?`<div class="kv"><span class="kk">Offre suggérée</span><span class="kv-val a">${fmt(f.prix_offre_suggere)}</span></div>`:''}
-        ${f.comparaison_marche?`<div style="font-size:11px;color:var(--t2);margin-top:10px;line-height:1.6;">${f.comparaison_marche}</div>`:''}
-      </div>
-      ${risques?`<div class="section full"><div class="section-title">Risques identifiés</div>${risques}</div>`:''}
-      ${nego?`<div class="section full"><div class="section-title">Points à négocier</div>${nego}</div>`:''}
-      ${chars?`<div class="section full"><div class="section-title">Caractéristiques</div><div class="flags">${chars}</div></div>`:''}
+    <div class="score-ring" style="border-color:${sColor};background:${sBg};">
+      <span class="score-n" style="color:${sColor};">${sc}</span>
+      <span class="score-d" style="color:${sColor};">/10</span>
     </div>
-    ${f.verdict?`<div class="verdict-bar"><div class="verdict-label">Verdict</div><div class="verdict-text">${f.verdict}</div></div>`:''}
-  </div>`;
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-l">Prix</div><div class="kpi-v b">${fmt(f.prix)}</div></div>
+    ${f.mrb?`<div class="kpi"><div class="kpi-l">MRB</div><div class="kpi-v ${f.mrb<=10?'g':'r'}">${f.mrb.toFixed(1)}</div></div>`:''}
+    ${cf!=null?`<div class="kpi"><div class="kpi-l">Cashflow</div><div class="kpi-v ${cfCls}">${cfStr}</div></div>`:''}
+    ${f.rendement_mise_fonds_pct?`<div class="kpi"><div class="kpi-l">Rendement</div><div class="kpi-v ${f.rendement_mise_fonds_pct>0?'g':'r'}">${f.rendement_mise_fonds_pct}%/an</div></div>`:''}
+  </div>
+  <div class="res-body">
+    <div class="sec">
+      <div class="sec-t">Financier</div>
+      ${f.eval_municipale?`<div class="kv"><span class="kk">Éval. municipale</span><span class="vv">${fmt(f.eval_municipale)}</span></div>`:''}
+      ${ecart!=null?`<div class="kv"><span class="kk">Écart prix / éval.</span><span class="vv ${ecart>0?'r':'g'}">${ecart>0?'+':''}${ecart}%</span></div>`:''}
+      ${f.revenus_bruts_annuels?`<div class="kv"><span class="kk">Revenus bruts</span><span class="vv">${fmt(f.revenus_bruts_annuels)}/an</span></div>`:''}
+      ${f.taxes_annuelles?`<div class="kv"><span class="kk">Taxes</span><span class="vv">${fmt(f.taxes_annuelles)}/an</span></div>`:''}
+      ${f.mise_fonds_min?`<div class="kv"><span class="kk">Mise de fonds min.</span><span class="vv">${fmtK(f.mise_fonds_min)} (${f.mise_fonds_pct}%)</span></div>`:''}
+      ${f.prime_schl?`<div class="kv"><span class="kk">Prime SCHL (${f.prime_schl_pct}%)</span><span class="vv a">+ ${fmtK(f.prime_schl)}</span></div>`:''}
+      ${f.pret_total?`<div class="kv"><span class="kk">Prêt total avec prime</span><span class="vv">${fmt(f.pret_total)}</span></div>`:''}
+      ${f.versement_mensuel?`<div class="kv"><span class="kk">Versement hypo.</span><span class="vv">${Math.round(f.versement_mensuel).toLocaleString('fr-CA')}\u202f$/mois</span></div>`:''}
+    </div>
+    <div class="sec">
+      <div class="sec-t">Marché &amp; potentiel</div>
+      <div class="kv"><span class="kk">Valeur estimée</span><span class="vv ${f.sous_valeur?'g':''}">${f.estimation_valeur_marchande?fmt(f.estimation_valeur_marchande):'—'}</span></div>
+      <div class="kv"><span class="kk">Sous valeur marchande</span><span class="vv ${f.sous_valeur?'g':'r'}">${f.sous_valeur?'Oui ✓':'Non'}</span></div>
+      <div class="kv"><span class="kk">Subdivision</span><span class="vv ${f.potentiel_sub?'g':'r'}">${f.potentiel_sub?'Possible ✓':'Non'}</span></div>
+      ${f.superficie_terrain?`<div class="kv"><span class="kk">Terrain</span><span class="vv">${f.superficie_terrain}</span></div>`:''}
+      ${f.prix_offre_suggere?`<div class="kv"><span class="kk">Offre suggérée</span><span class="vv b">${fmt(f.prix_offre_suggere)}</span></div>`:''}
+      ${f.comparaison_marche?`<div style="font-size:11px;color:var(--t2);margin-top:8px;line-height:1.6;">${f.comparaison_marche}</div>`:''}
+    </div>
+    ${chars?`<div class="sec full"><div class="sec-t">Caractéristiques</div><div class="tags">${chars}</div></div>`:''}
+    ${risques?`<div class="sec full"><div class="sec-t">Risques identifiés</div>${risques}</div>`:''}
+    ${nego?`<div class="sec full"><div class="sec-t">Points à négocier</div>${nego}</div>`:''}
+  </div>
+  ${f.verdict?`<div class="verdict"><strong>Verdict :</strong> ${f.verdict}</div>`:''}
+</div>`;
 }
 
-// ── History ──────────────────────────────────────────────────────────────────
-const HIST_KEY = 'hh_history_v1';
-const MAX_HIST = 50;
-
-function saveToHistory(f) {
-  try {
-    const raw = localStorage.getItem(HIST_KEY);
-    const hist = raw ? JSON.parse(raw) : [];
-    // Add timestamp
-    const entry = { ...f, _savedAt: new Date().toISOString() };
-    // Avoid duplicates (same adresse + prix)
-    const idx = hist.findIndex(h => h.adresse === f.adresse && h.prix === f.prix);
-    if (idx >= 0) hist.splice(idx, 1);
-    hist.unshift(entry);
-    if (hist.length > MAX_HIST) hist.splice(MAX_HIST);
-    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
-    updateHistCount();
-  } catch(e) {}
+// History
+const HK='hh_history_v1';
+function saveHist(f){try{const h=JSON.parse(localStorage.getItem(HK)||'[]'),e={...f,_at:new Date().toISOString()};const i=h.findIndex(x=>x.adresse===f.adresse&&x.prix===f.prix);if(i>=0)h.splice(i,1);h.unshift(e);if(h.length>50)h.splice(50);localStorage.setItem(HK,JSON.stringify(h));updateBadge();}catch(e){}}
+function loadHist(){try{return JSON.parse(localStorage.getItem(HK)||'[]');}catch(e){return[];}}
+function clearHist(){if(!confirm("Effacer tout l'historique ?"))return;localStorage.removeItem(HK);renderHist();updateBadge();}
+function updateBadge(){const n=loadHist().length,b=document.getElementById('hBadge');if(b){b.style.display=n>0?'inline-block':'none';b.textContent=n;}}
+function renderHist(){
+  const h=loadHist(),l=document.getElementById('histList');
+  if(!h.length){l.innerHTML='<div class="empty"><div class="empty-ico">📋</div>Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici.</div>';return;}
+  const td=new Date().toDateString(),yd=new Date(Date.now()-86400000).toDateString();
+  const g={};h.forEach(f=>{const d=new Date(f._at).toDateString();const k=d===td?"Aujourd'hui":d===yd?'Hier':new Date(f._at).toLocaleDateString('fr-CA',{day:'numeric',month:'long'});if(!g[k])g[k]=[];g[k].push(f);});
+  l.innerHTML=Object.entries(g).map(([date,items])=>`<div class="hist-group">${date}</div>${items.map(f=>{const sc=f.score_mega_deal||0,cf=f.cashflow_mensuel,col=sc>=7?'var(--green)':sc>=5?'var(--amber)':'var(--red)';const cfS=cf!=null?(cf>0?'+':'')+Math.round(cf).toLocaleString('fr-CA')+'\u202f$/mois':'';return`<div class="hi${sc>=7?' mega':sc<=3?' bad':''}" onclick='showHistDetail(${JSON.stringify(f).replace(/'/g,"&#39;")})'>
+    <div><div class="hi-title">${f.titre||f.adresse||'Propriété'}</div><div class="hi-meta">${[f.ville,f.type,f.prix?(f.prix/1000).toFixed(0)+'k\u202f$':'',cfS].filter(Boolean).join(' · ')}</div></div>
+    <div class="hi-score" style="color:${col}">${sc}/10</div>
+  </div>`}).join('')}`).join('');
 }
+function showHistDetail(f){goTo('analyzer');document.getElementById('results').innerHTML=renderCard(f);document.getElementById('results').scrollIntoView({behavior:'smooth'});}
 
-function loadHistory() {
-  try {
-    const raw = localStorage.getItem(HIST_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch(e) { return []; }
+// Chat
+function qSugg(b){document.getElementById('chatIn').value=b.textContent;document.getElementById('chatSuggs').style.display='none';sendChat();}
+async function sendChat(){
+  const inp=document.getElementById('chatIn');const msg=inp.value.trim();if(!msg)return;inp.value='';
+  addMsg(msg,'u');chatHistory.push({role:'user',content:msg});
+  const tid='t'+Date.now();addMsg('...','a',tid,true);
+  const ctx=results.length?results.map(f=>`${f.titre||f.adresse}|Prix:${f.prix}$|MRB:${f.mrb||'?'}|CF:${f.cashflow_mensuel!=null?f.cashflow_mensuel+'$/m':'?'}|Score:${f.score_mega_deal}/10`).join('\n'):'Aucune propriété.';
+  try{
+    const d=await callAPI({model:'claude-sonnet-4-20250514',max_tokens:600,system:`Expert immobilier Québec. Concis et chiffré.\nPropriétés: ${ctx}\nTaux: ${customTaux}%, amort: ${customAmort} ans\nSCHL: 5%≤500k, 5%+10% 500k-999k, 20%≥1M$. Prime: 4%/<10%, 3.1%/10-15%, 2.8%/15-20%.`,messages:chatHistory.slice(-10)});
+    const rep=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    document.getElementById(tid)?.remove();addMsg(rep||'Pas de réponse.','a');chatHistory.push({role:'assistant',content:rep});
+  }catch(e){document.getElementById(tid)?.remove();addMsg('Erreur: '+e.message,'a');}
 }
-
-function clearHistory() {
-  if (!confirm('Effacer tout l\'historique ?')) return;
-  localStorage.removeItem(HIST_KEY);
-  renderHistory();
-  updateHistCount();
+function addMsg(txt,type,id,thinking){
+  const m=document.getElementById('chatMsgs');m.querySelector('.chat-empty')?.remove();
+  const d=document.createElement('div');d.className=type==='u'?'msg-u':('msg-a'+(thinking?' thinking':''));
+  if(id)d.id=id;d.innerHTML=txt.replace(/\n/g,'<br>');m.appendChild(d);m.scrollTop=m.scrollHeight;
 }
-
-function updateHistCount() {
-  const hist = loadHistory();
-  const el = document.getElementById('hist-count');
-  if (el) el.textContent = hist.length > 0 ? '(' + hist.length + ')' : '';
-}
-
-function showSection(s) {
-  document.getElementById('section-analyzer').style.display = s === 'analyzer' ? 'block' : 'none';
-  document.getElementById('section-history').style.display = s === 'history' ? 'block' : 'none';
-  document.getElementById('nav-analyzer').style.background = s === 'analyzer' ? 'rgba(212,168,83,0.15)' : 'transparent';
-  document.getElementById('nav-analyzer').style.color = s === 'analyzer' ? 'var(--accent)' : 'var(--t2)';
-  document.getElementById('nav-analyzer').style.borderColor = s === 'analyzer' ? 'var(--accent2)' : 'var(--border2)';
-  document.getElementById('nav-history').style.background = s === 'history' ? 'rgba(212,168,83,0.15)' : 'transparent';
-  document.getElementById('nav-history').style.color = s === 'history' ? 'var(--accent)' : 'var(--t2)';
-  document.getElementById('nav-history').style.borderColor = s === 'history' ? 'var(--accent2)' : 'var(--border2)';
-  if (s === 'history') renderHistory();
-}
-
-function renderHistory() {
-  const hist = loadHistory();
-  const list = document.getElementById('histList');
-  if (!hist.length) {
-    list.innerHTML = '<div class="empty">Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici automatiquement.</div>';
-    return;
-  }
-  // Group by date
-  const today = new Date().toDateString();
-  const yesterday = new Date(Date.now()-86400000).toDateString();
-  const groups = {};
-  hist.forEach(f => {
-    const d = new Date(f._savedAt).toDateString();
-    const label = d === today ? "Aujourd'hui" : d === yesterday ? 'Hier' : new Date(f._savedAt).toLocaleDateString('fr-CA', {day:'numeric',month:'long',year:'numeric'});
-    if (!groups[label]) groups[label] = [];
-    groups[label].push(f);
-  });
-  list.innerHTML = Object.entries(groups).map(([date, items]) => `
-    <div class="hist-section-title">${date}</div>
-    ${items.map((f,i) => {
-      const sc = f.score_mega_deal || 0;
-      const col = sc >= 7 ? 'var(--accent)' : sc >= 5 ? 'var(--green)' : 'var(--t3)';
-      const cf = f.cashflow_mensuel;
-      const cfL = cf !== undefined && cf !== null ? (cf > 0 ? '+' : '') + Math.round(cf).toLocaleString('fr-CA') + '\u202f$/mois' : '';
-      return `<div class="hist-card${sc >= 7 ? ' mega' : ''}" onclick='showHistDetail(${JSON.stringify(f).replace(/'/g,"&#39;")})'>
-        <div class="hist-card-left">
-          <div class="hist-card-title">${f.titre || f.adresse || 'Propriété'}</div>
-          <div class="hist-card-meta">${[f.ville, f.type, f.prix ? (f.prix/1000).toFixed(0)+'k\u202f$' : '', cfL].filter(Boolean).join(' · ')}</div>
-        </div>
-        <div class="hist-card-score" style="color:${col}">${sc}/10</div>
-      </div>`;
-    }).join('')}
-  `).join('');
-}
-
-function showHistDetail(f) {
-  // Switch to analyzer tab and show the report
-  showSection('analyzer');
-  document.getElementById('results').innerHTML = renderCard(f);
-  document.getElementById('results').scrollIntoView({behavior:'smooth'});
-}
-
-function compareAll(){
-  if(results.length<2)return;
-  alert('Comparaison:\n\n'+results.map(f=>`${f.titre||f.adresse}\nScore: ${f.score_mega_deal}/10 | Prix: ${f.prix?(f.prix/1000).toFixed(0)+'k$':'?'} | MRB: ${f.mrb?f.mrb.toFixed(1):'N/A'} | Cashflow: ${f.cashflow_mensuel!==undefined?(f.cashflow_mensuel>0?'+':'')+f.cashflow_mensuel+'$/mois':'N/A'}`).join('\n\n'));
-}
-
-// ── Chat ──────────────────────────────────────────────────────────────────────
-let chatHistory = [];
-
-function sendSugg(btn) {
-  document.getElementById('chatInput').value = btn.textContent;
-  document.getElementById('chatSuggs').style.display = 'none';
-  sendChat();
-}
-
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-
-  // Add user message
-  addChatMsg(msg, 'u');
-  chatHistory.push({ role: 'user', content: msg });
-
-  // Thinking indicator
-  const thinkId = 'think_' + Date.now();
-  addChatMsg('Analyse en cours...', 'a', thinkId);
-
-  // Build context from current results
-  const ctx = results.length > 0
-    ? results.map(f => `Propriété: ${f.titre||f.adresse} | Prix: ${f.prix?f.prix+'$':''} | MRB: ${f.mrb||'N/A'} | Cashflow: ${f.cashflow_mensuel!==undefined?f.cashflow_mensuel+'$/mois':''} | Score: ${f.score_mega_deal||0}/10 | Ville: ${f.ville||''} | Revenus: ${f.revenus_bruts_annuels||0}$/an | Éval. mun.: ${f.eval_municipale||0}$`).join('\n')
-    : 'Aucune propriété analysée dans cette session.';
-
-  const rCtx = rateData ? `Taux variable: ${rateData.variable}, Taux fixe: ${rateData.fixe}` : '';
-
-  try {
-    const d = await callAPI({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 800,
-      system: `Tu es un expert en investissement immobilier au Québec. Tu aides l'utilisateur à comprendre et analyser des propriétés immobilières.
-
-PROPRIÉTÉS ANALYSÉES DANS CETTE SESSION:
-${ctx}
-
-${rCtx}
-
-RÈGLES:
-- Réponds en français, de façon concise et pratique
-- Si on te demande un calcul, fais-le et montre le résultat clairement
-- MRB idéal: ≤10 | Cashflow positif = bon | Mise de fonds SCHL: 5%≤500k, 5%+10% tranche 500k-999k, 20%≥1M$
-- Amortissement standard: 25 ans
-- Sois direct et chiffré`,
-      messages: chatHistory.slice(-10) // Keep last 10 messages for context
-    });
-
-    const reply = (d.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-    document.getElementById(thinkId)?.remove();
-    addChatMsg(reply || "Désolé, je n'ai pas pu répondre.", 'a');
-    chatHistory.push({ role: 'assistant', content: reply });
-
-  } catch(e) {
-    document.getElementById(thinkId)?.remove();
-    addChatMsg('Erreur: ' + e.message, 'a');
-  }
-}
-
-function addChatMsg(text, type, id) {
-  const msgs = document.getElementById('chatMsgs');
-  // Remove intro if present
-  const intro = msgs.querySelector('.chat-intro');
-  if (intro) intro.remove();
-
-  const div = document.createElement('div');
-  div.className = type === 'u' ? 'msg-u' : 'msg-a' + (id ? ' msg-thinking' : '');
-  if (id) div.id = id;
-  div.innerHTML = text.replace(/\n/g, '<br>');
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-// Update showSection to handle chat tab
-const _origShowSection = showSection;
-showSection = function(s) {
-  _origShowSection(s);
-  // Handle chat tab
-  document.getElementById('section-chat').style.display = s === 'chat' ? 'block' : 'none';
-  document.getElementById('nav-chat').style.background = s === 'chat' ? 'rgba(212,168,83,0.15)' : 'transparent';
-  document.getElementById('nav-chat').style.color = s === 'chat' ? 'var(--accent)' : 'var(--t2)';
-  document.getElementById('nav-chat').style.borderColor = s === 'chat' ? 'var(--accent2)' : 'var(--border2)';
-  // Hide chat from original showSection if not chat
-  if (s !== 'chat') document.getElementById('section-chat').style.display = 'none';
-};
-
 </script>
 </body>
 </html>
