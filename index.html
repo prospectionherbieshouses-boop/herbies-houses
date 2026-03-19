@@ -147,6 +147,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .zoning-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 12px;border-radius:var(--r2);background:var(--blue-bg);color:var(--blue);border:0.5px solid rgba(88,130,192,0.25);margin-top:8px;flex-wrap:wrap;}
 .zone-code{font-weight:500;font-family:'DM Serif Display',serif;font-size:14px;}
 .empty{text-align:center;padding:3rem 1rem;color:var(--t3);font-size:13px;line-height:1.8;}
+.hist-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.hist-bar h3{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;color:var(--t1);}
+.hist-bar button{font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:var(--r2);border:0.5px solid var(--border);}
+.hist-bar button:hover{color:var(--red);border-color:var(--red);}
+.hist-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:8px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.hist-card:hover{border-color:var(--accent2);}
+.hist-card.mega{border-left:3px solid var(--accent);border-radius:0 var(--r) var(--r) 0;}
+.hist-card-left{flex:1;min-width:0;}
+.hist-card-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hist-card-meta{font-size:11px;color:var(--t3);}
+.hist-card-score{font-size:13px;font-weight:500;flex-shrink:0;}
+.hist-section-title{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;margin-top:1rem;}
 .empty-icon{font-size:32px;margin-bottom:12px;opacity:.4;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--bg4);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -182,6 +194,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 <!-- MAIN APP -->
 <div id="mainApp" style="display:none;">
 
+<div style="display:flex;gap:8px;margin-bottom:1.25rem;">
+  <button onclick="showSection('analyzer')" id="nav-analyzer" style="flex:1;padding:9px;border-radius:var(--r2);border:0.5px solid var(--accent2);background:rgba(212,168,83,0.15);color:var(--accent);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">Analyser</button>
+  <button onclick="showSection('history')" id="nav-history" style="flex:1;padding:9px;border-radius:var(--r2);border:0.5px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">Historique <span id="hist-count"></span></button>
+</div>
+
+<div id="section-analyzer">
 <div class="masthead">
   <div class="masthead-icon">
     <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -289,6 +307,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
   </div>
 </div>
 
+</div><!-- end section-analyzer -->
+
+<div id="section-history" style="display:none;">
+  <div class="hist-bar">
+    <h3>Historique des analyses</h3>
+    <button onclick="clearHistory()">Tout effacer</button>
+  </div>
+  <div id="histList"><div class="empty">Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici automatiquement.</div></div>
+</div>
+
 </div><!-- end mainApp -->
 
 <script>
@@ -326,6 +354,7 @@ function showApp() {
   const hint = API_KEY.slice(0,10) + '...' + API_KEY.slice(-4);
   document.getElementById('apiKeyHint').textContent = hint;
   loadRates();
+  updateHistCount();
 }
 document.getElementById('apiKeyInput').addEventListener('keydown', e => { if (e.key==='Enter') saveApiKey(); });
 
@@ -594,7 +623,7 @@ async function analyzeAll(){
     document.getElementById('results').appendChild(lDiv);
     try{
       const f=await analyzeFiche(items[i],rate);
-      if(f){f._src=items[i].label;results.push(f);document.getElementById(lid).outerHTML=renderCard(f);}
+      if(f){f._src=items[i].label;results.push(f);document.getElementById(lid).outerHTML=renderCard(f);saveToHistory(f);}
       else document.getElementById(lid).outerHTML=`<div class="report"><div class="empty">Impossible d'analyser. Essayez l'onglet "Texte copié".</div></div>`;
     }catch(e){
       document.getElementById(lid).outerHTML=`<div class="report"><div class="empty">Erreur: ${e.message}<br><br>Si votre clé API est incorrecte, cliquez "Changer de clé" en haut.</div></div>`;
@@ -684,6 +713,100 @@ function renderCard(f){
     </div>
     ${f.verdict?`<div class="verdict-bar"><div class="verdict-label">Verdict</div><div class="verdict-text">${f.verdict}</div></div>`:''}
   </div>`;
+}
+
+// ── History ──────────────────────────────────────────────────────────────────
+const HIST_KEY = 'hh_history_v1';
+const MAX_HIST = 50;
+
+function saveToHistory(f) {
+  try {
+    const raw = localStorage.getItem(HIST_KEY);
+    const hist = raw ? JSON.parse(raw) : [];
+    // Add timestamp
+    const entry = { ...f, _savedAt: new Date().toISOString() };
+    // Avoid duplicates (same adresse + prix)
+    const idx = hist.findIndex(h => h.adresse === f.adresse && h.prix === f.prix);
+    if (idx >= 0) hist.splice(idx, 1);
+    hist.unshift(entry);
+    if (hist.length > MAX_HIST) hist.splice(MAX_HIST);
+    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+    updateHistCount();
+  } catch(e) {}
+}
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HIST_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function clearHistory() {
+  if (!confirm('Effacer tout l\'historique ?')) return;
+  localStorage.removeItem(HIST_KEY);
+  renderHistory();
+  updateHistCount();
+}
+
+function updateHistCount() {
+  const hist = loadHistory();
+  const el = document.getElementById('hist-count');
+  if (el) el.textContent = hist.length > 0 ? '(' + hist.length + ')' : '';
+}
+
+function showSection(s) {
+  document.getElementById('section-analyzer').style.display = s === 'analyzer' ? 'block' : 'none';
+  document.getElementById('section-history').style.display = s === 'history' ? 'block' : 'none';
+  document.getElementById('nav-analyzer').style.background = s === 'analyzer' ? 'rgba(212,168,83,0.15)' : 'transparent';
+  document.getElementById('nav-analyzer').style.color = s === 'analyzer' ? 'var(--accent)' : 'var(--t2)';
+  document.getElementById('nav-analyzer').style.borderColor = s === 'analyzer' ? 'var(--accent2)' : 'var(--border2)';
+  document.getElementById('nav-history').style.background = s === 'history' ? 'rgba(212,168,83,0.15)' : 'transparent';
+  document.getElementById('nav-history').style.color = s === 'history' ? 'var(--accent)' : 'var(--t2)';
+  document.getElementById('nav-history').style.borderColor = s === 'history' ? 'var(--accent2)' : 'var(--border2)';
+  if (s === 'history') renderHistory();
+}
+
+function renderHistory() {
+  const hist = loadHistory();
+  const list = document.getElementById('histList');
+  if (!hist.length) {
+    list.innerHTML = '<div class="empty">Aucune analyse sauvegardée.<br>Vos prochaines analyses apparaîtront ici automatiquement.</div>';
+    return;
+  }
+  // Group by date
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  const groups = {};
+  hist.forEach(f => {
+    const d = new Date(f._savedAt).toDateString();
+    const label = d === today ? "Aujourd'hui" : d === yesterday ? 'Hier' : new Date(f._savedAt).toLocaleDateString('fr-CA', {day:'numeric',month:'long',year:'numeric'});
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(f);
+  });
+  list.innerHTML = Object.entries(groups).map(([date, items]) => `
+    <div class="hist-section-title">${date}</div>
+    ${items.map((f,i) => {
+      const sc = f.score_mega_deal || 0;
+      const col = sc >= 7 ? 'var(--accent)' : sc >= 5 ? 'var(--green)' : 'var(--t3)';
+      const cf = f.cashflow_mensuel;
+      const cfL = cf !== undefined && cf !== null ? (cf > 0 ? '+' : '') + Math.round(cf).toLocaleString('fr-CA') + '\u202f$/mois' : '';
+      return `<div class="hist-card${sc >= 7 ? ' mega' : ''}" onclick='showHistDetail(${JSON.stringify(f).replace(/'/g,"&#39;")})'>
+        <div class="hist-card-left">
+          <div class="hist-card-title">${f.titre || f.adresse || 'Propriété'}</div>
+          <div class="hist-card-meta">${[f.ville, f.type, f.prix ? (f.prix/1000).toFixed(0)+'k\u202f$' : '', cfL].filter(Boolean).join(' · ')}</div>
+        </div>
+        <div class="hist-card-score" style="color:${col}">${sc}/10</div>
+      </div>`;
+    }).join('')}
+  `).join('');
+}
+
+function showHistDetail(f) {
+  // Switch to analyzer tab and show the report
+  showSection('analyzer');
+  document.getElementById('results').innerHTML = renderCard(f);
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
 }
 
 function compareAll(){
