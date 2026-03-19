@@ -536,7 +536,7 @@ function showApp(){
   updateBadge();
   // Bookmarklet param
   const p=new URLSearchParams(window.location.search).get('fiche');
-  if(p){const t=decodeURIComponent(p);items.push({type:'text',text:t,label:t.split('\n')[0].replace('URL: ','').slice(0,60)||'Fiche'});renderItems();updBtn();window.history.replaceState({},'',location.pathname);setTimeout(()=>document.getElementById('analyzeBtn').scrollIntoView({behavior:'smooth'}),500);}
+  if(p){const t=decodeURIComponent(p);items.push({type:'text',text:t,label:t.split('\n')[0].replace('URL: ','').slice(0,60)||'Fiche'});renderItems();updBtn();window.history.replaceState({},'',window.location.pathname);setTimeout(()=>document.getElementById('analyzeBtn').scrollIntoView({behavior:'smooth'}),500);}
 }
 document.getElementById('apiIn').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
 window.addEventListener('DOMContentLoaded',()=>{const k=getK();if(k){API_KEY=k;showApp();}else{document.getElementById('apiModal').classList.remove('off');}});
@@ -669,9 +669,6 @@ function addUrl(){let v=document.getElementById('urlIn').value.trim();if(!v)retu
 document.getElementById('urlIn').addEventListener('keydown',e=>{if(e.key==='Enter')addUrl();});
 function addText(){const t=document.getElementById('txtIn').value.trim(),l=document.getElementById('txtLabel').value.trim();if(!t)return;items.push({type:'text',text:t,label:l||'Fiche #'+(items.length+1)});document.getElementById('txtIn').value='';document.getElementById('txtLabel').value='';renderItems();updBtn();}
 function removeItem(i){items.splice(i,1);renderItems();updBtn();}
-function renderItems(){
-  const l=document.getElementById('itemList');if(!items.length){l.innerHTML='';return;}
-  const ic={url:'🔗',text:'📋',pdf:'📄',pdf_text:'📄',image:'📸'};
 function propIcon(type,titre){
   if(!type&&!titre)return'🏢';
   const t=(type||'').toLowerCase()+(titre||'').toLowerCase();
@@ -685,6 +682,9 @@ function propIcon(type,titre){
   if(t.includes('terrain'))return'🌿';
   return'🏢';
 }
+function renderItems(){
+  const l=document.getElementById('itemList');if(!items.length){l.innerHTML='';return;}
+  const ic={url:'🔗',text:'📋',pdf:'📄',pdf_text:'📄',image:'📸'};
   l.innerHTML=items.map((it,i)=>`<div class="item"><span>${ic[it.type]||'📎'} ${it.label}</span><button onclick="removeItem(${i})">✕</button></div>`).join('');
 }
 function updBtn(){document.getElementById('analyzeBtn').disabled=items.length===0;}
