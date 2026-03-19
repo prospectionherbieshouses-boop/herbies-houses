@@ -240,6 +240,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
   <div class="rate-pill"><div class="rpl">Amortissement</div><div class="rpv">25 ans</div><div class="rps">Règle SCHL standard</div></div>
 </div>
 
+<div style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.25rem;">
+  <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Paramètres de calcul personnalisés</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <label style="font-size:12px;color:var(--t2);">Taux d'intérêt</label>
+        <span style="font-size:14px;font-weight:500;color:var(--accent);" id="tauxDisplay">3.35%</span>
+      </div>
+      <input type="range" id="tauxSlider" min="1" max="10" step="0.05" value="3.35" style="width:100%;" oninput="updateParams()"/>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:3px;"><span>1%</span><span>10%</span></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <label style="font-size:12px;color:var(--t2);">Amortissement</label>
+        <span style="font-size:14px;font-weight:500;color:var(--accent);" id="amortDisplay">25 ans</span>
+      </div>
+      <input type="range" id="amortSlider" min="15" max="30" step="1" value="25" style="width:100%;" oninput="updateParams()"/>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:3px;"><span>15 ans</span><span>30 ans</span></div>
+    </div>
+  </div>
+  <div style="margin-top:10px;font-size:11px;color:var(--t3);display:flex;gap:16px;flex-wrap:wrap;">
+    <span>Mise de fonds : 5% ≤500k · 5%+10% tranche 500k-999k · 20% ≥1M$ · Prime SCHL : 4% si &lt;10% · 3,1% si 10-15% · 2,8% si 15-20%</span>
+  </div>
+</div>
+
 <div class="input-card">
   <label>Ajouter une fiche</label>
   <div class="tabs">
@@ -390,7 +415,13 @@ function showApp() {
   document.getElementById('mainApp').style.display = 'block';
   const hint = API_KEY.slice(0,10) + '...' + API_KEY.slice(-4);
   document.getElementById('apiKeyHint').textContent = hint;
-  loadRates();
+  loadRates().then(r => {
+    if(r && r.vn) {
+      customTaux = r.vn;
+      document.getElementById('tauxSlider').value = r.vn;
+      document.getElementById('tauxDisplay').textContent = r.vn.toFixed(2) + '%';
+    }
+  });
   updateHistCount();
   // Check if a fiche was passed via URL param (from bookmarklet)
   const params = new URLSearchParams(window.location.search);
@@ -603,12 +634,39 @@ function applyRates(r){
 }
 
 // ── Calcs ────────────────────────────────────────────────────────────────────
-function calcMDF(p){if(p<=500000)return{pct:5,val:Math.round(p*.05)};if(p<1000000)return{pct:parseFloat(((25000+(p-500000)*.1)/p*100).toFixed(1)),val:Math.round(25000+(p-500000)*.1)};return{pct:20,val:Math.round(p*.2)};}
+// Custom calculation params (updated by sliders)
+let customTaux = 3.35;
+let customAmort = 25;
+
+function updateParams() {
+  customTaux = parseFloat(document.getElementById('tauxSlider').value);
+  customAmort = parseInt(document.getElementById('amortSlider').value);
+  document.getElementById('tauxDisplay').textContent = customTaux.toFixed(2) + '%';
+  document.getElementById('amortDisplay').textContent = customAmort + ' ans';
+}
+
+function calcMDF(p){
+  let mdf,pct;
+  if(p<=500000){pct=5;mdf=Math.round(p*.05);}
+  else if(p<1000000){mdf=Math.round(25000+(p-500000)*.10);pct=parseFloat((mdf/p*100).toFixed(1));}
+  else{pct=20;mdf=Math.round(p*.20);}
+  const mdfPct=mdf/p*100;
+  let prime=0,primePct=0;
+  if(mdfPct<20){
+    if(mdfPct<10)primePct=4.00;
+    else if(mdfPct<15)primePct=3.10;
+    else primePct=2.80;
+    prime=Math.round((p-mdf)*primePct/100);
+  }
+  return{pct,val:mdf,prime,primePct,pretAvecPrime:(p-mdf)+prime};
+}
 function calcVers(m,ta,mo){const r=ta/100/12;if(r===0)return m/mo;return m*r*Math.pow(1+r,mo)/(Math.pow(1+r,mo)-1);}
 function calcFin(prix,revA,taux,taxA){
-  const mdf=calcMDF(prix),pret=prix-mdf.val,v=calcVers(pret,taux,300);
+  const mois=customAmort*12;
+  const mdf=calcMDF(prix);
+  const v=calcVers(mdf.pretAvecPrime,taux,mois);
   const tx=taxA?taxA/12:(prix*.01)/12,ch=(revA/12)*.32,rev=revA/12,cf=Math.round(rev-v-tx-ch);
-  return{mdf:mdf.val,mdfPct:mdf.pct,vers:Math.round(v),cf,mrb:revA>0?Math.round(prix/revA*10)/10:null,rend:mdf.val>0&&revA>0?Math.round(cf*12/mdf.val*1000)/10:0};
+  return{mdf:mdf.val,mdfPct:mdf.pct,prime:mdf.prime,primePct:mdf.primePct,pretTotal:mdf.pretAvecPrime,vers:Math.round(v),cf,mrb:revA>0?Math.round(prix/revA*10)/10:null,rend:mdf.val>0&&revA>0?Math.round(cf*12/mdf.val*1000)/10:0};
 }
 
 // ── Analyze ──────────────────────────────────────────────────────────────────
@@ -617,6 +675,8 @@ const SYS=`Tu es un expert en investissement immobilier au Québec. Analyse la f
 CALCULS: MRB=Prix/Revenus bruts annuels. Versement avec taux variable fourni, mise de fonds SCHL minimale, amortissement 25 ans. Cashflow=Revenus-(Versement+Taxes+Charges 32%). Rendement=Cashflow annuel/Mise de fonds.
 
 SCHL: 5% ≤500k | 5%+10% tranche 500k-999k | 20% ≥1M$
+PRIME SCHL (s'ajoute au prêt): MDF<10%→4.00% | MDF 10-15%→3.10% | MDF 15-20%→2.80% | MDF≥20%→0%
+Versement = calculé sur (prêt + prime SCHL)
 
 SCORE/10: MRB≤8:+3|MRB≤10:+2|Cashflow+:+3|Cashflow>-300:+1|Prix<marché:+2|Subdivision:+2. Score≥7=MÉGA DEAL.
 
@@ -626,7 +686,7 @@ JSON UNIQUEMENT:
 {"titre":"","adresse":"","ville":"","type":"","nb_logements":0,"prix":0,"eval_municipale":0,"revenus_bruts_annuels":0,"taxes_annuelles":0,"annee_construction":0,"superficie_terrain":"","mrb":null,"mise_fonds_min":0,"mise_fonds_pct":0,"versement_mensuel":0,"cashflow_mensuel":0,"rendement_mise_fonds_pct":0,"sous_valeur":false,"estimation_valeur_marchande":0,"comparaison_marche":"","potentiel_sub":false,"zonage_code":"","zonage_description":"","logements_max_permis":0,"score_mega_deal":0,"est_mega":false,"flags":[],"risques":[],"points_negociation":[],"caracteristiques":[],"verdict":"","prix_offre_suggere":0}`;
 
 async function analyzeFiche(item,rate){
-  const taux=rate.vn||3.35;
+  const taux=customTaux||rate.vn||3.35;
   const sys=SYS+`\n\nTaux du jour: variable=${rate.variable}, fixe=${rate.fixe} (utilise ${taux}% pour calculs)\nAmortissement: 25 ans`;
   let userContent;
   if(item.type==='url') userContent=[{type:'text',text:'Analyse cette fiche: '+item.url}];
@@ -744,6 +804,9 @@ function renderCard(f){
         ${f.versement_mensuel?`<div class="kv"><span class="kk">Versement hypo.</span><span class="kv-val">${Math.round(f.versement_mensuel).toLocaleString('fr-CA')}\u202f$/mois</span></div>`:''}
         ${cf!==undefined?`<div class="kv"><span class="kk">Cashflow net</span><span class="kv-val ${cfC}">${cfL}</span></div>`:''}
         ${f.mise_fonds_min?`<div class="kv"><span class="kk">Mise de fonds min.</span><span class="kv-val">${fmtK(f.mise_fonds_min)} (${f.mise_fonds_pct}%)</span></div>`:''}
+        
+        ${f.prime?`<div class="kv"><span class="kk">Prime SCHL (${f.primePct}%)</span><span class="kv-val w">+${fmtK(f.prime)}</span></div>`:''}
+        ${f.pretTotal?`<div class="kv"><span class="kk">Prêt total avec prime</span><span class="kv-val">${fmt(f.pretTotal)}</span></div>`:''}
         ${f.rendement_mise_fonds_pct?`<div class="kv"><span class="kk">Rendement/mise</span><span class="kv-val ${f.rendement_mise_fonds_pct>0?'g':'b'}">${f.rendement_mise_fonds_pct}%/an</span></div>`:''}
         ${f.taxes_annuelles?`<div class="kv"><span class="kk">Taxes annuelles</span><span class="kv-val">${fmt(f.taxes_annuelles)}</span></div>`:''}
         ${flags?`<div class="flags" style="margin-top:10px;">${flags}</div>`:''}
