@@ -1,9 +1,7 @@
 """
-centris.py — Scrape les plex à vendre sur Centris (MLS Québec)
-via leur API interne non-officielle.
+centris.py — Scrape les plex à vendre sur Centris via Playwright.
 
-Ciblage : Montréal — Rosemont, Villeray, Ahuntsic, Montréal-Nord, St-Michel
-Types   : Duplex, Triplex, Quadruplex, Quintuplex
+Navigue directement sur la page de recherche Centris et extrait les annonces.
 
 Usage :
     python centris.py
@@ -13,147 +11,146 @@ import re
 import json
 import time
 import hashlib
-import requests
 from datetime import datetime
-from bs4 import BeautifulSoup
 
-BASE_URL = "https://www.centris.ca"
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/javascript, */*; q=0.01",
-    "Accept-Language": "fr-CA,fr;q=0.9,en;q=0.8",
-    "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest",
-    "Referer": "https://www.centris.ca/fr",
-}
+BASE_URL  = "https://www.centris.ca"
+SEARCH_URL = "https://www.centris.ca/fr/plex~a-vendre~montreal?view=Thumbnail"
 
 PAGE_SIZE = 20
 
 
 def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
-    """Scrape tous les plex à vendre à Montréal via l'API Centris."""
+    """Scrape les plex à vendre à Montréal via Playwright."""
+    try:
+        from playwright.sync_api import sync_playwright
+        print("  Playwright disponible — navigation réelle")
+        return _scrape_playwright(max_price)
+    except ImportError:
+        print("  Playwright non disponible — tentative requests")
+        return _scrape_requests(max_price)
+
+
+def _scrape_playwright(max_price: int) -> list[dict]:
+    """Scrape via Playwright (navigateur réel, contourne le bot-detection)."""
+    from playwright.sync_api import sync_playwright
+    from bs4 import BeautifulSoup
+
+    listings = []
+    seen_ids  = set()
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=[
+            "--no-sandbox",
+            "--disable-blink-features=AutomationControlled",
+        ])
+        ctx = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            locale="fr-CA",
+            viewport={"width": 1280, "height": 800},
+        )
+        page = ctx.new_page()
+        page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+        print(f"  Ouverture de Centris...")
+        page.goto(SEARCH_URL, wait_until="networkidle", timeout=60_000)
+        time.sleep(3)
+
+        # Fermer popup cookie si présent
+        try:
+            page.click("button:has-text('Accepter')", timeout=3000)
+            time.sleep(1)
+        except Exception:
+            pass
+
+        page_num = 1
+        while True:
+            print(f"  Page {page_num}...")
+            html  = page.content()
+            soup  = BeautifulSoup(html, "html.parser")
+            cards = soup.find_all("div", class_=re.compile(r"property-thumbnail-item"))
+
+            if not cards:
+                cards = soup.find_all("article", class_=re.compile(r"property|listing"))
+
+            if not cards:
+                print(f"  Aucune carte trouvée sur la page {page_num}")
+                break
+
+            for card in cards:
+                listing = _parse_card(card)
+                if not listing:
+                    continue
+                if listing["id"] in seen_ids:
+                    continue
+                if listing["price"] > max_price:
+                    continue
+                listings.append(listing)
+                seen_ids.add(listing["id"])
+
+            print(f"  Page {page_num} : {len(cards)} annonces | total : {len(listings)}")
+
+            # Chercher le bouton "Page suivante"
+            try:
+                next_btn = page.query_selector("li.next a, a[aria-label='Suivant'], button:has-text('Suivant')")
+                if not next_btn:
+                    break
+                next_btn.click()
+                page.wait_for_load_state("networkidle", timeout=15_000)
+                time.sleep(3)
+                page_num += 1
+            except Exception:
+                break
+
+        browser.close()
+
+    return listings
+
+
+def _scrape_requests(max_price: int) -> list[dict]:
+    """Fallback : scrape via requests + BeautifulSoup."""
+    import requests
+    from bs4 import BeautifulSoup
 
     session = requests.Session()
     session.headers.update({
-        "User-Agent": HEADERS["User-Agent"],
-        "Accept-Language": HEADERS["Accept-Language"],
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept-Language": "fr-CA,fr;q=0.9,en;q=0.8",
         "Referer": BASE_URL + "/fr",
     })
 
-    # Étape 1 — Charger la page pour obtenir les cookies + token CSRF
-    print("  Connexion à Centris...")
-    try:
-        resp_home = session.get(BASE_URL + "/fr", timeout=20)
-        time.sleep(2)
-        # Extraire le token CSRF requis par l'API
-        soup_home = BeautifulSoup(resp_home.text, "html.parser")
-        token_el  = soup_home.find("input", {"name": "__RequestVerificationToken"})
-        if not token_el:
-            token_el = soup_home.find("meta", {"name": "__RequestVerificationToken"})
-        csrf_token = token_el["value"] if token_el else ""
-        if csrf_token:
-            HEADERS["RequestVerificationToken"] = csrf_token
-            print(f"  Token CSRF obtenu : {csrf_token[:20]}...")
-        else:
-            print("  Avertissement : token CSRF non trouvé")
-    except Exception as e:
-        print(f"  Erreur connexion: {e}")
-        return []
-
-    # Étape 2 — Définir la requête de recherche (plex Montréal)
-    print("  Configuration de la recherche...")
-    query = {
-        "query": {
-            "UseGeographyFilter": False,
-            "Filters": [
-                {
-                    "Name": "Category",
-                    "Values": ["Plex"]
-                },
-                {
-                    "Name": "SalePrice",
-                    "Values": ["0", str(max_price)],
-                    "RangeMin": "0",
-                    "RangeMax": str(max_price),
-                },
-            ],
-            "FieldsToFacetOn": [],
-            "NumberOfResults": PAGE_SIZE,
-            "StartPosition": 0,
-            "SortOrder": "A",
-            "SortBy": "Date",
-            "CarouselOffset": 0,
-            "IsMapViewActive": False,
-        },
-        "isFullTextSearch": False,
-        "includeInactive": False,
-    }
-
-    try:
-        resp = session.post(
-            BASE_URL + "/api/property/UpdateQuery",
-            json=query,
-            headers=HEADERS,
-            timeout=20,
-        )
-        resp.raise_for_status()
-    except Exception as e:
-        print(f"  Erreur UpdateQuery: {e}")
-        return []
-
-    time.sleep(2)
-
-    # Étape 3 — Récupérer toutes les pages
     listings = []
-    start = 0
+    seen_ids  = set()
+    page_num  = 1
 
     while True:
+        url = SEARCH_URL if page_num == 1 else f"{SEARCH_URL}&page={page_num}"
         try:
-            resp = session.post(
-                BASE_URL + "/Property/GetInscriptions",
-                json={"startPosition": start},
-                headers=HEADERS,
-                timeout=20,
-            )
+            resp = session.get(url, timeout=20)
             resp.raise_for_status()
-            data = resp.json()
         except Exception as e:
-            print(f"  Erreur GetInscriptions (start={start}): {e}")
+            print(f"  Erreur page {page_num}: {e}")
             break
 
-        result     = data.get("d", {}).get("Result", {})
-        html_chunk = result.get("html", "")
-        count      = result.get("count", 0)
-
-        if not html_chunk:
-            html_chunk = data.get("Inscriptions", "")
-            count      = data.get("count", 0)
-
-        if not html_chunk:
-            break
-
-        soup  = BeautifulSoup(html_chunk, "html.parser")
-        cards = soup.find_all("div", class_=re.compile(r"property-thumbnail-item|inscription-thumbnail"))
-
-        if not cards:
-            cards = soup.find_all("article")
+        soup  = BeautifulSoup(resp.text, "html.parser")
+        cards = soup.find_all("div", class_=re.compile(r"property-thumbnail-item"))
 
         if not cards:
             break
 
         for card in cards:
             listing = _parse_card(card)
-            if listing:
-                listings.append(listing)
+            if not listing or listing["id"] in seen_ids or listing["price"] > max_price:
+                continue
+            listings.append(listing)
+            seen_ids.add(listing["id"])
 
-        print(f"  Page {start // PAGE_SIZE + 1}: {len(cards)} annonces | total: {len(listings)}")
+        print(f"  Page {page_num} : {len(cards)} annonces | total : {len(listings)}")
 
-        if start + PAGE_SIZE >= count or len(cards) < PAGE_SIZE:
+        if len(cards) < PAGE_SIZE:
             break
 
-        start += PAGE_SIZE
-        time.sleep(3)  # délai anti-scraping minimum
+        page_num += 1
+        time.sleep(3)
 
     return listings
 
@@ -161,6 +158,7 @@ def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
 def _parse_card(card) -> dict | None:
     """Extraire les données d'une carte d'annonce Centris."""
     try:
+        # Prix
         price_el = card.find(class_=re.compile(r"price"))
         if not price_el:
             return None
@@ -168,34 +166,38 @@ def _parse_card(card) -> dict | None:
         if not price:
             return None
 
+        # Adresse
         addr_el = card.find(class_=re.compile(r"address|location|civic"))
         address = addr_el.get_text(strip=True) if addr_el else "N/A"
 
+        # Lien
         link_el = card.find("a", href=True)
         href    = link_el["href"] if link_el else ""
         url     = (BASE_URL + href) if href.startswith("/") else href
 
+        # Photo
         img_el = card.find("img")
-        image  = img_el.get("src", "") or img_el.get("data-src", "") if img_el else ""
+        image  = ""
+        if img_el:
+            image = img_el.get("src", "") or img_el.get("data-src", "") or img_el.get("data-lazy-src", "")
 
+        # Texte complet
         full_text = card.get_text(" ", strip=True)
         units     = _extract_units(full_text) or 2
-
-        # Revenus bruts déclarés (si disponibles dans la fiche)
-        income = _extract_income(full_text)
+        income    = _extract_income(full_text)
 
         return {
-            "id":            "ct_" + hashlib.md5(url.encode()).hexdigest()[:10],
-            "source":        "Centris",
-            "type":          _detect_type(units),
-            "units":         units,
-            "price":         price,
-            "address":       address,
-            "url":           url,
-            "image":         image,
-            "description":   full_text[:500],
-            "declared_income": income,  # None si non déclaré
-            "scraped_at":    datetime.now().isoformat(),
+            "id":              "ct_" + hashlib.md5(url.encode()).hexdigest()[:10],
+            "source":          "Centris",
+            "type":            _detect_type(units),
+            "units":           units,
+            "price":           price,
+            "address":         address,
+            "url":             url,
+            "image":           image,
+            "description":     full_text[:500],
+            "declared_income": income,
+            "scraped_at":      datetime.now().isoformat(),
         }
     except Exception:
         return None
@@ -221,11 +223,8 @@ def _extract_units(text: str) -> int | None:
 
 
 def _extract_income(text: str) -> int | None:
-    """Tenter d'extraire les revenus bruts déclarés dans l'annonce."""
     m = re.search(r"revenus?\s*(?:bruts?)?\s*:?\s*\$?\s*([\d\s,]+)", text, re.IGNORECASE)
-    if m:
-        return _to_int(m.group(1))
-    return None
+    return _to_int(m.group(1)) if m else None
 
 
 if __name__ == "__main__":
@@ -235,28 +234,8 @@ if __name__ == "__main__":
     listings = scrape_centris(max_price=2_000_000)
 
     if not listings:
-        print("Aucune annonce trouvée. L'API Centris a peut-être changé.")
+        print("Aucune annonce trouvée.")
     else:
-        output = "../../data/listings.json"
-        with open(output, "w", encoding="utf-8") as f:
+        with open("listings_centris.json", "w", encoding="utf-8") as f:
             json.dump(listings, f, ensure_ascii=False, indent=2)
-
-        print()
-        print(f"{'='*50}")
-        print(f"TOTAL : {len(listings)} plex")
-        print(f"{'='*50}")
-
-        by_type: dict[str, int] = {}
-        for l in listings:
-            t = l["type"]
-            by_type[t] = by_type.get(t, 0) + 1
-        for t, count in sorted(by_type.items()):
-            print(f"  {t}: {count}")
-
-        prices = [l["price"] for l in listings]
-        print()
-        print(f"Prix min  : ${min(prices):,}")
-        print(f"Prix max  : ${max(prices):,}")
-        print(f"Prix moyen: ${int(sum(prices)/len(prices)):,}")
-        print()
-        print(f"Sauvegardé dans : {output}")
+        print(f"\nTOTAL : {len(listings)} annonces — sauvegardé dans listings_centris.json")
