@@ -21,15 +21,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Chemins relatifs au fichier main.py
-BASE_DIR    = os.path.dirname(os.path.dirname(__file__))
-DATA_DIR    = os.path.join(BASE_DIR, "data")
-SCRAPER_DIR = os.path.join(BASE_DIR, "scraper")
+# Chemins absolus basés sur l'emplacement de main.py
+BASE_DIR      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR      = os.path.join(BASE_DIR, "data")
+SCRAPER_DIR   = os.path.join(BASE_DIR, "scraper")
+BACKEND_DIR   = os.path.dirname(os.path.abspath(__file__))
 LISTINGS_FILE = os.path.join(DATA_DIR, "listings.json")
 
 # Ajouter scraper/ et backend/ au path Python
 sys.path.insert(0, SCRAPER_DIR)
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, BACKEND_DIR)
 
 from analyzer import analyze_all, analyze_listing, calculate_cashflow
 
