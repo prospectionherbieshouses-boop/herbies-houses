@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Herbies">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+  <title>Herbies — Deals Immo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple:   #6366f1;
+      --purple-d: #4f46e5;
+      --green:    #22c55e;
+      --yellow:   #f59e0b;
+      --red:      #ef4444;
+      --bg:       #f8fafc;
+      --card:     #ffffff;
+      --border:   #e2e8f0;
+      --text:     #1e293b;
+      --muted:    #64748b;
+      --radius:   12px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    /* ── Layout ── */
+    #app { display: flex; flex-direction: column; height: 100%; }
+
+    header {
+      background: var(--purple);
+      color: white;
+      padding: calc(16px + var(--safe-top)) 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 20px; font-weight: 700; }
+    header .subtitle { font-size: 12px; opacity: .75; margin-top: 2px; }
+
+    .content { flex: 1; overflow-y: auto; padding: 16px; }
+
+    nav {
+      display: flex;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding-bottom: var(--safe-bot);
+      flex-shrink: 0;
+    }
+    nav button {
+      flex: 1;
+      border: none;
+      background: none;
+      padding: 10px 4px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: color .15s;
+    }
+    nav button.active { color: var(--purple); }
+    nav button svg { width: 22px; height: 22px; }
+
+    /* ── Tabs ── */
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .toolbar select, .toolbar input {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      background: var(--card);
+      color: var(--text);
+      flex: 1;
+      min-width: 0;
+    }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity .15s;
+    }
+    .btn:active { opacity: .8; }
+    .btn-primary { background: var(--purple); color: white; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .card-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: #e2e8f0;
+      display: block;
+    }
+    .card-img-placeholder {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .card-body { padding: 14px; }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .card-type { font-size: 12px; font-weight: 600; color: var(--purple); background: #eef2ff; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+    .card-score { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+    .score-high { background: #dcfce7; color: #166534; }
+    .score-mid  { background: #fef9c3; color: #713f12; }
+    .score-low  { background: #fee2e2; color: #991b1b; }
+    .card-address { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .card-price { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .metric { background: var(--bg); border-radius: 8px; padding: 8px; text-align: center; }
+    .metric-val { font-size: 16px; font-weight: 700; }
+    .metric-val.positive { color: var(--green); }
+    .metric-val.negative { color: var(--red); }
+    .metric-val.neutral  { color: var(--yellow); }
+    .metric-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    .card-footer { display: flex; gap: 8px; }
+    .card-footer a { flex: 1; text-align: center; }
+
+    /* ── Simulateur ── */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .form-group input, .form-group select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 15px;
+      background: var(--card);
+      color: var(--text);
+    }
+    .form-group input:focus, .form-group select:focus { outline: 2px solid var(--purple); border-color: transparent; }
+
+    .result-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .result-box h3 { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
+    .result-cashflow {
+      font-size: 36px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .result-sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .result-rows {}
+    .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .label { color: var(--muted); }
+    .result-row .value { font-weight: 600; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; justify-content: center; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-ok  { background: #dcfce7; color: #166534; }
+    .badge-bad { background: #fee2e2; color: #991b1b; }
+
+    /* ── Alertes ── */
+    .section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 12px; }
+    .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 15px; }
+    .settings-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--border);
+      border-radius: 26px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      left: 3px; bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--purple); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty h3 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .empty p { font-size: 14px; }
+
+    /* ── Scraper status banner ── */
+    .scraper-banner {
+      background: #fef9c3;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .scraper-banner.running { background: #eef2ff; border-color: #c7d2fe; }
+    .spinner { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Loaders ── */
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <header>
+    <div>
+      <h1>🏠 Herbies</h1>
+      <div class="subtitle" id="header-sub">Deals immobiliers Montréal</div>
+    </div>
+    <button class="btn btn-primary" id="btn-scrape" onclick="triggerScrape()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0 1 15.4-6M20 15a9 9 0 0 1-15.4 6"/></svg>
+      Scraper
+    </button>
+  </header>
+
+  <!-- Content area -->
+  <div class="content">
+
+    <!-- Tab: Deals -->
+    <div class="tab active" id="tab-deals">
+      <div id="scraper-status-banner" style="display:none"></div>
+
+      <div class="toolbar">
+        <select id="filter-sort" onchange="renderDeals()">
+          <option value="score">Trier par score</option>
+          <option value="cashflow_monthly">Trier par cashflow</option>
+          <option value="price">Trier par prix</option>
+          <option value="cap_rate_pct">Trier par cap rate</option>
+        </select>
+        <select id="filter-min-cf" onchange="renderDeals()">
+          <option value="0">Tous les cashflows</option>
+          <option value="1">Cashflow positif</option>
+          <option value="200">Cashflow ≥ 200$/mois</option>
+          <option value="400">Cashflow ≥ 400$/mois</option>
+        </select>
+      </div>
+
+      <div id="deals-list"></div>
+    </div>
+
+    <!-- Tab: Simulateur -->
+    <div class="tab" id="tab-sim">
+      <div class="form-group">
+        <label>Prix demandé ($)</label>
+        <input type="number" id="sim-price" value="700000" min="100000" step="10000">
+      </div>
+      <div class="form-group">
+        <label>Nombre de logements</label>
+        <select id="sim-units">
+          <option value="2">Duplex (2)</option>
+          <option value="3" selected>Triplex (3)</option>
+          <option value="4">Quadruplex (4)</option>
+          <option value="5">Quintuplex (5)</option>
+          <option value="6">6-plex</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Revenus bruts mensuels ($) — optionnel</label>
+        <input type="number" id="sim-income" placeholder="Laissez vide pour estimer" min="0" step="100">
+      </div>
+      <div class="form-group">
+        <label>Taux hypothécaire (%)</label>
+        <input type="number" id="sim-rate" value="4.69" min="0.1" max="20" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Mise de fonds (%)</label>
+        <input type="number" id="sim-down" value="20" min="5" max="50" step="1">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="runSimulation()">
+        Calculer le cashflow
+      </button>
+      <div id="sim-result"></div>
+    </div>
+
+    <!-- Tab: Alertes -->
+    <div class="tab" id="tab-alerts">
+      <div class="section-title">Notifications</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Alertes email</div>
+            <div class="settings-sub">Nouveaux deals avec cashflow positif</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notif-email" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Seuil cashflow minimum</div>
+            <div class="settings-sub">Ne notifier que si ≥ ce montant</div>
+          </div>
+          <select id="notif-threshold" style="width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px">
+            <option value="0">0 $/mois</option>
+            <option value="200" selected>200 $/mois</option>
+            <option value="400">400 $/mois</option>
+            <option value="600">600 $/mois</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">Filtres de recherche</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Prix maximum</div>
+          </div>
+          <select id="filter-max-price" style="width:140px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px">
+            <option value="1000000">1 M$</option>
+            <option value="1500000" selected>1,5 M$</option>
+            <option value="2000000">2 M$</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Types de propriétés</div>
+          </div>
+          <div style="font-size:13px;color:var(--muted)">Duplex → 6-plex</div>
+        </div>
+      </div>
+
+      <div class="section-title">API Backend</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">URL du backend</div>
+            <div class="settings-sub" id="api-status-text">Non connecté</div>
+          </div>
+          <button class="btn btn-secondary" onclick="testConnection()" style="font-size:12px;padding:6px 12px">Tester</button>
+        </div>
+        <div class="settings-row">
+          <div style="flex:1">
+            <input type="text" id="api-url" value="http://localhost:8000"
+              style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px">
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;text-align:center">
+        <p style="font-size:12px;color:var(--muted)">Taux utilisés : fixe 4,69% · variable 3,95%</p>
+        <p style="font-size:12px;color:var(--muted)">Mise de fonds : 20% · Vacance : 3%</p>
+        <p style="font-size:11px;color:#cbd5e1;margin-top:8px">Herbies Houses v1.0 — Mars 2026</p>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom nav -->
+  <nav>
+    <button class="active" id="nav-deals" onclick="switchTab('deals')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Deals
+    </button>
+    <button id="nav-sim" onclick="switchTab('sim')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Simulateur
+    </button>
+    <button id="nav-alerts" onclick="switchTab('alerts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Alertes
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+let API_URL    = localStorage.getItem('api_url') || 'http://localhost:8000';
+let listings   = JSON.parse(localStorage.getItem('listings') || '[]');
+let scrapeTimer = null;
+
+// Charger l'URL depuis l'input
+document.getElementById('api-url').value = API_URL;
+document.getElementById('api-url').addEventListener('change', e => {
+  API_URL = e.target.value.replace(/\/$/, '');
+  localStorage.setItem('api_url', API_URL);
+});
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+}
+
+// ── Deals ────────────────────────────────────────────────────────────────────
+async function loadDeals() {
+  const sortBy   = document.getElementById('filter-sort').value;
+  const minCf    = document.getElementById('filter-min-cf').value;
+  const maxPrice = document.getElementById('filter-max-price')?.value || 2000000;
+
+  try {
+    const res = await fetch(`${API_URL}/listings?sort_by=${sortBy}&min_cashflow=${minCf}&max_price=${maxPrice}`);
+    if (!res.ok) throw new Error(res.statusText);
+    const data = await res.json();
+    listings = data.listings || [];
+    localStorage.setItem('listings', JSON.stringify(listings));
+    updateHeaderSub(data.count, data.scraped_at);
+    renderDeals();
+  } catch (e) {
+    // Afficher les données en cache si disponibles
+    if (listings.length) {
+      renderDeals();
+      showBanner('warning', '⚠️ Backend non connecté — données en cache');
+    } else {
+      renderEmpty();
+    }
+  }
+}
+
+function renderDeals() {
+  const sortBy  = document.getElementById('filter-sort').value;
+  const minCf   = parseInt(document.getElementById('filter-min-cf').value);
+
+  let filtered = listings
+    .filter(l => (l.cashflow_monthly || 0) >= minCf)
+    .sort((a, b) => {
+      if (sortBy === 'mrb') return (a[sortBy] || 999) - (b[sortBy] || 999);
+      return (b[sortBy] || 0) - (a[sortBy] || 0);
+    });
+
+  const el = document.getElementById('deals-list');
+  if (!filtered.length) { renderEmpty(); return; }
+  el.innerHTML = filtered.map(renderCard).join('');
+}
+
+function renderCard(l) {
+  const cf      = l.cashflow_monthly || 0;
+  const cfColor = cf >= 200 ? 'positive' : cf >= 0 ? 'neutral' : 'negative';
+  const cfSign  = cf >= 0 ? '+' : '';
+  const capRate = (l.cap_rate_pct || 0).toFixed(1);
+  const mrb     = (l.mrb || 0).toFixed(1);
+  const score   = l.score || 0;
+  const scoreClass = score >= 7 ? 'score-high' : score >= 5 ? 'score-mid' : 'score-low';
+  const imgHtml = l.image
+    ? `<img class="card-img" src="${l.image}" alt="${l.address}" loading="lazy" onerror="this.style.display='none'">`
+    : `<div class="card-img-placeholder">🏠</div>`;
+
+  return `
+  <div class="card">
+    ${imgHtml}
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-type">${l.type || 'Plex'} · ${l.units || '?'} log.</span>
+        <span class="card-score ${scoreClass}">★ ${score}/10</span>
+      </div>
+      <div class="card-address">${l.address || 'Adresse inconnue'}</div>
+      <div class="card-price">${formatPrice(l.price)}</div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-val ${cfColor}">${cfSign}${Math.round(cf)} $</div>
+          <div class="metric-label">cashflow/mois</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val ${parseFloat(capRate) >= 4.5 ? 'positive' : 'negative'}">${capRate}%</div>
+          <div class="metric-label">cap rate</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val ${parseFloat(mrb) <= 15 ? 'positive' : 'negative'}">${mrb}x</div>
+          <div class="metric-label">MRB</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="${l.url || '#'}" target="_blank" class="btn btn-primary" style="font-size:13px;padding:8px">Voir sur Centris →</a>
+        <button class="btn btn-secondary" onclick="simulateFromListing(${JSON.stringify(l).replace(/"/g, '&quot;')})" style="font-size:13px;padding:8px">Simuler</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderEmpty() {
+  document.getElementById('deals-list').innerHTML = `
+  <div class="empty">
+    <div class="empty-icon">🔍</div>
+    <h3>Aucun deal trouvé</h3>
+    <p>Lance le scraper pour charger les annonces Centris,<br>ou ajuste les filtres.</p>
+    <br>
+    <button class="btn btn-primary" onclick="triggerScrape()">Lancer le scraper</button>
+  </div>`;
+}
+
+function updateHeaderSub(count, scrapedAt) {
+  const sub = document.getElementById('header-sub');
+  if (scrapedAt) {
+    const d = new Date(scrapedAt);
+    sub.textContent = `${count} annonces · ${d.toLocaleDateString('fr-CA')}`;
+  } else {
+    sub.textContent = `${count} annonces`;
+  }
+}
+
+// ── Scraper ──────────────────────────────────────────────────────────────────
+async function triggerScrape() {
+  const btn = document.getElementById('btn-scrape');
+  btn.disabled = true;
+  showBanner('running', '<span class="spinner">⟳</span> Scraping Centris en cours...');
+
+  try {
+    const res = await fetch(`${API_URL}/scrape`, { method: 'POST' });
+    if (res.status === 409) {
+      showBanner('running', '<span class="spinner">⟳</span> Scraper déjà en cours...');
+    } else if (!res.ok) {
+      throw new Error(await res.text());
+    }
+    pollScrapeStatus();
+  } catch (e) {
+    showBanner('warning', `⚠️ Impossible de contacter le backend : ${e.message}`);
+    btn.disabled = false;
+  }
+}
+
+function pollScrapeStatus() {
+  clearInterval(scrapeTimer);
+  scrapeTimer = setInterval(async () => {
+    try {
+      const res  = await fetch(`${API_URL}/scrape/status`);
+      const data = await res.json();
+      if (!data.running) {
+        clearInterval(scrapeTimer);
+        document.getElementById('btn-scrape').disabled = false;
+        hideBanner();
+        await loadDeals();
+      }
+    } catch {
+      clearInterval(scrapeTimer);
+      document.getElementById('btn-scrape').disabled = false;
+    }
+  }, 3000);
+}
+
+function showBanner(type, html) {
+  const el = document.getElementById('scraper-status-banner');
+  el.innerHTML = html;
+  el.className = `scraper-banner${type === 'running' ? ' running' : ''}`;
+  el.style.display = 'flex';
+}
+
+function hideBanner() {
+  document.getElementById('scraper-status-banner').style.display = 'none';
+}
+
+// ── Simulateur ───────────────────────────────────────────────────────────────
+async function runSimulation() {
+  const price  = parseInt(document.getElementById('sim-price').value);
+  const units  = parseInt(document.getElementById('sim-units').value);
+  const income = document.getElementById('sim-income').value;
+  const rate   = parseFloat(document.getElementById('sim-rate').value) / 100;
+  const down   = parseFloat(document.getElementById('sim-down').value) / 100;
+
+  const body = { price, units, rate, down_pct: down };
+  if (income) body.declared_income = parseInt(income);
+
+  let result;
+  try {
+    const res = await fetch(`${API_URL}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    result = await res.json();
+  } catch {
+    // Calcul client-side si backend indisponible
+    result = calcClientSide(price, units, income ? parseInt(income) : null, rate, down);
+  }
+  renderSimResult(result, price);
+}
+
+function calcClientSide(price, units, income, rate, down) {
+  // Loyers estimés (valeurs par défaut)
+  const rentPerUnit = 1100;
+  const grossRent   = income || units * rentPerUnit;
+  const vacancy     = grossRent * 0.03;
+  const netRent     = grossRent - vacancy;
+
+  const principal   = price * (1 - down);
+  const r           = rate / 12;
+  const n           = 25 * 12;
+  const mortgage    = principal * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
+  const taxes       = price * 0.008 / 12;
+  const insurance   = 2400 / 12;
+  const maintenance = price * 0.01 / 12;
+  const totalExp    = mortgage + taxes + insurance + maintenance;
+  const cashflow    = netRent - totalExp;
+
+  const noi     = (netRent - taxes - insurance - maintenance) * 12;
+  const capRate = noi / price * 100;
+  const mrb     = price / (grossRent * 12);
+
+  return {
+    gross_rent_monthly:    grossRent,
+    vacancy_monthly:       vacancy,
+    mortgage_monthly:      mortgage,
+    taxes_monthly:         taxes,
+    insurance_monthly:     insurance,
+    maintenance_monthly:   maintenance,
+    total_expenses_monthly: totalExp,
+    cashflow_monthly:      cashflow,
+    mise_de_fonds:         price * down,
+    cap_rate_pct:          capRate,
+    mrb:                   mrb,
+    cashflow_ok:           cashflow >= 200,
+    cap_rate_ok:           capRate >= 4.5,
+    mrb_ok:                mrb <= 15,
+    score:                 cashflow >= 400 ? 8 : cashflow >= 200 ? 6 : cashflow >= 0 ? 4 : 2,
+  };
+}
+
+function renderSimResult(r, price) {
+  const cf      = r.cashflow_monthly || 0;
+  const cfColor = cf >= 200 ? 'var(--green)' : cf >= 0 ? 'var(--yellow)' : 'var(--red)';
+
+  document.getElementById('sim-result').innerHTML = `
+  <div class="result-box">
+    <h3>Résultat — ${formatPrice(price)}</h3>
+    <div class="result-cashflow" style="color:${cfColor}">
+      ${cf >= 0 ? '+' : ''}${Math.round(cf)} $/mois
+    </div>
+    <div class="result-sub">cashflow mensuel estimé</div>
+
+    <div class="result-rows">
+      <div class="result-row"><span class="label">Revenus bruts</span><span class="value">${fmt(r.gross_rent_monthly)} $/mois</span></div>
+      <div class="result-row"><span class="label">Vacance (3%)</span><span class="value">−${fmt(r.vacancy_monthly)} $</span></div>
+      <div class="result-row"><span class="label">Hypothèque</span><span class="value">−${fmt(r.mortgage_monthly)} $</span></div>
+      <div class="result-row"><span class="label">Taxes munic.</span><span class="value">−${fmt(r.taxes_monthly)} $</span></div>
+      <div class="result-row"><span class="label">Assurances</span><span class="value">−${fmt(r.insurance_monthly)} $</span></div>
+      <div class="result-row"><span class="label">Entretien (1%)</span><span class="value">−${fmt(r.maintenance_monthly)} $</span></div>
+      <div class="result-row" style="font-weight:700"><span class="label">Total dépenses</span><span class="value">${fmt(r.total_expenses_monthly)} $/mois</span></div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+      <div class="metric">
+        <div class="metric-val">${(r.cap_rate_pct || 0).toFixed(1)}%</div>
+        <div class="metric-label">Cap rate</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">${(r.mrb || 0).toFixed(1)}x</div>
+        <div class="metric-label">MRB</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val">${formatPrice(r.mise_de_fonds || 0)}</div>
+        <div class="metric-label">Mise de fonds</div>
+      </div>
+    </div>
+
+    <div class="badges">
+      <span class="badge ${r.cashflow_ok ? 'badge-ok' : 'badge-bad'}">${r.cashflow_ok ? '✓' : '✗'} Cashflow > 200$</span>
+      <span class="badge ${r.cap_rate_ok ? 'badge-ok' : 'badge-bad'}">${r.cap_rate_ok ? '✓' : '✗'} Cap rate > 4,5%</span>
+      <span class="badge ${r.mrb_ok ? 'badge-ok' : 'badge-bad'}">${r.mrb_ok ? '✓' : '✗'} MRB < 15x</span>
+    </div>
+  </div>`;
+}
+
+function simulateFromListing(l) {
+  document.getElementById('sim-price').value = l.price;
+  document.getElementById('sim-units').value = Math.min(6, Math.max(2, l.units || 2));
+  if (l.declared_income) document.getElementById('sim-income').value = l.declared_income;
+  switchTab('sim');
+  runSimulation();
+}
+
+// ── Connexion ────────────────────────────────────────────────────────────────
+async function testConnection() {
+  const el = document.getElementById('api-status-text');
+  el.textContent = 'Test en cours...';
+  try {
+    const res  = await fetch(`${API_URL}/health`, { signal: AbortSignal.timeout(5000) });
+    const data = await res.json();
+    el.textContent = `✓ Connecté — ${data.timestamp ? new Date(data.timestamp).toLocaleTimeString('fr-CA') : 'OK'}`;
+    el.style.color = 'var(--green)';
+  } catch {
+    el.textContent = '✗ Non connecté';
+    el.style.color = 'var(--red)';
+  }
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function formatPrice(p) {
+  if (!p) return 'N/A';
+  if (p >= 1_000_000) return `${(p/1_000_000).toFixed(2)} M$`;
+  return `${Math.round(p/1000)} k$`;
+}
+
+function fmt(n) { return Math.round(n || 0).toLocaleString('fr-CA'); }
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadDeals();
+</script>
+
+<!-- Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
