@@ -14,23 +14,43 @@ import hashlib
 from datetime import datetime
 
 BASE_URL  = "https://www.centris.ca"
-SEARCH_URL = "https://www.centris.ca/fr/plex~a-vendre~montreal?view=Thumbnail"
-
 PAGE_SIZE = 20
+
+# Villes cibles — slug Centris dans l'URL
+SEARCH_CITIES = [
+    ("Montréal",      "montreal"),
+    ("Verdun",        "verdun"),
+    ("Cowansville",   "cowansville"),
+    ("Magog",         "magog"),
+    ("Bromont",       "bromont"),
+    ("Trois-Rivières","trois-rivieres"),
+]
 
 
 def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
-    """Scrape les plex à vendre à Montréal via Playwright."""
-    try:
-        from playwright.sync_api import sync_playwright
-        print("  Playwright disponible — navigation réelle")
-        return _scrape_playwright(max_price)
-    except ImportError:
-        print("  Playwright non disponible — tentative requests")
-        return _scrape_requests(max_price)
+    """Scrape les plex à vendre dans toutes les villes cibles."""
+    all_listings = []
+    seen_ids     = set()
+
+    for city_name, city_slug in SEARCH_CITIES:
+        search_url = f"{BASE_URL}/fr/plex~a-vendre~{city_slug}?view=Thumbnail"
+        print(f"\n  Ville : {city_name}")
+        try:
+            from playwright.sync_api import sync_playwright
+            listings = _scrape_playwright(max_price, search_url)
+        except ImportError:
+            listings = _scrape_requests(max_price, search_url)
+
+        new = [l for l in listings if l["id"] not in seen_ids]
+        for l in new:
+            seen_ids.add(l["id"])
+        all_listings.extend(new)
+        print(f"  {city_name} : {len(new)} annonces")
+
+    return all_listings
 
 
-def _scrape_playwright(max_price: int) -> list[dict]:
+def _scrape_playwright(max_price: int, search_url: str = "") -> list[dict]:
     """Scrape via Playwright (navigateur réel, contourne le bot-detection)."""
     from playwright.sync_api import sync_playwright
     from bs4 import BeautifulSoup
@@ -52,7 +72,7 @@ def _scrape_playwright(max_price: int) -> list[dict]:
         page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
         print(f"  Ouverture de Centris...")
-        page.goto(SEARCH_URL, wait_until="networkidle", timeout=60_000)
+        page.goto(search_url, wait_until="networkidle", timeout=60_000)
         time.sleep(3)
 
         # Fermer popup cookie si présent
@@ -137,7 +157,7 @@ def _fetch_declared_income(url: str, session) -> int | None:
     return None
 
 
-def _scrape_requests(max_price: int) -> list[dict]:
+def _scrape_requests(max_price: int, search_url: str = "") -> list[dict]:
     """Fallback : scrape via requests + BeautifulSoup."""
     import requests
     from bs4 import BeautifulSoup
@@ -154,7 +174,7 @@ def _scrape_requests(max_price: int) -> list[dict]:
     page_num  = 1
 
     while True:
-        url = SEARCH_URL if page_num == 1 else f"{SEARCH_URL}&page={page_num}"
+        url = search_url if page_num == 1 else f"{search_url}&page={page_num}"
         try:
             resp = session.get(url, timeout=20)
             resp.raise_for_status()
