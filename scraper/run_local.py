@@ -1,5 +1,5 @@
 """
-run_local.py — Lance le scraper Centris localement et envoie les résultats à Railway.
+run_local.py — Scrape Centris et sauvegarde les résultats localement.
 
 Usage :
     python run_local.py
@@ -9,18 +9,16 @@ Usage :
 import json
 import sys
 import os
-import requests
+from datetime import datetime
 from pathlib import Path
 
-# URL du backend Railway
-RAILWAY_URL = "https://web-production-ca9a1.up.railway.app"
-
-# Ajouter le dossier scraper au path
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 from centris import scrape_centris
 from analyzer import analyze_all
+
+DATA_FILE = Path(__file__).parent.parent / "app" / "listings.json"
 
 
 def main():
@@ -37,7 +35,7 @@ def main():
         print("Aucune annonce trouvée. Vérifiez votre connexion internet.")
         return
 
-    print(f"  {len(listings)} annonces récupérées")
+    print(f"  {len(listings)} annonces récupérées avec revenus déclarés")
     print()
 
     # 2. Analyser le cashflow
@@ -46,45 +44,35 @@ def main():
     print(f"  {len(analyzed)} annonces analysées")
     print()
 
-    # 3. Sauvegarder localement
-    data_dir = Path(__file__).parent.parent / "data"
-    data_dir.mkdir(exist_ok=True)
-    local_file = data_dir / "listings.json"
-    with open(local_file, "w", encoding="utf-8") as f:
-        json.dump(analyzed, f, ensure_ascii=False, indent=2)
-    print(f"  Sauvegardé localement : {local_file}")
-    print()
+    # 3. Sauvegarder dans app/listings.json (lu directement par le front)
+    DATA_FILE.parent.mkdir(exist_ok=True)
+    payload = {
+        "scraped_at": datetime.now().isoformat(),
+        "count":      len(analyzed),
+        "listings":   analyzed,
+    }
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    # 4. Envoyer à Railway
-    print("Étape 3 — Envoi vers Railway...")
-    try:
-        resp = requests.post(
-            f"{RAILWAY_URL}/listings/import",
-            json={"listings": analyzed},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        result = resp.json()
-        print(f"  {result['message']}")
-    except Exception as e:
-        print(f"  Erreur envoi Railway : {e}")
-        print("  Les données sont quand même sauvegardées localement.")
-        return
-
+    print(f"  Sauvegardé : {DATA_FILE}")
     print()
     print("=" * 50)
-    cashflow_positif = [l for l in analyzed if l.get("cashflow_monthly", 0) > 200]
-    print(f"  TOTAL       : {len(analyzed)} annonces")
-    print(f"  Cashflow +  : {len(cashflow_positif)} deals intéressants")
+
+    cashflow_pos = [l for l in analyzed if l.get("cashflow_monthly", 0) > 200]
+    print(f"  TOTAL      : {len(analyzed)} annonces")
+    print(f"  Cashflow + : {len(cashflow_pos)} deals intéressants")
+
     if analyzed:
         top = sorted(analyzed, key=lambda x: x.get("score", 0), reverse=True)[:3]
         print()
         print("  Top 3 deals :")
         for i, l in enumerate(top, 1):
-            print(f"  {i}. {l.get('address', 'N/A')} — {l.get('type', '')} — ${l.get('price', 0):,} — cashflow {l.get('cashflow_monthly', 0):+,.0f}$/mois")
+            cf = l.get("cashflow_monthly", 0)
+            print(f"  {i}. {l.get('address','N/A')} — {l.get('type','')} — ${l.get('price',0):,} — {cf:+,.0f}$/mois")
+
     print("=" * 50)
     print()
-    print(f"Voir les résultats : https://prospectionherbieshouses-boop.github.io/herbies-houses/")
+    print("  Ouvre serve.bat puis va sur http://localhost:8080")
 
 
 if __name__ == "__main__":

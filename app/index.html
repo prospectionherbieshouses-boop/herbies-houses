@@ -377,7 +377,7 @@ body { height: 100%; background: var(--bg); color: var(--text); font-family: var
 </nav>
 
 <script>
-const API_URL = localStorage.getItem('api_url') || 'https://web-production-ca9a1.up.railway.app';
+const DATA_FILE = 'listings.json';
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 function gotoPage(id, btn) {
@@ -469,7 +469,7 @@ function loadToCalc(d) {
 
 async function fetchListings() {
   try {
-    const r    = await fetch(`${API_URL}/listings?sort_by=score&min_cashflow=0&max_price=2000000`);
+    const r    = await fetch(DATA_FILE + '?t=' + Date.now());
     const data = await r.json();
     allListings = data.listings || [];
 
@@ -479,7 +479,7 @@ async function fetchListings() {
     renderDeals();
     updateScraperPage(data);
   } catch(e) {
-    document.getElementById('dealsEyebrow').textContent = 'Centris · Hors ligne';
+    document.getElementById('dealsEyebrow').textContent = 'Centris · Lance scraper.bat';
     renderDeals();
   }
 }
@@ -532,16 +532,8 @@ function updateScraperPage(data) {
   }).join('');
 }
 
-async function triggerScraper() {
-  try {
-    const r = await fetch(`${API_URL}/scrape`, { method: 'POST' });
-    if (r.status === 409) { alert('Scraper déjà en cours.'); return; }
-    document.getElementById('statusState').textContent = 'Scraping en cours...';
-    document.getElementById('statusLed').className = 'status-led running';
-    document.getElementById('runBtn').disabled = true;
-  } catch(e) {
-    alert('Lance scraper.bat directement sur ton laptop.');
-  }
+function triggerScraper() {
+  alert('Double-clique sur scraper.bat pour lancer le scrape.\nEnsuite rafraîchis cette page.');
 }
 
 // ── Calculateur ───────────────────────────────────────────────────────────────
