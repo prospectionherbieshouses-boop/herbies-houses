@@ -16,9 +16,11 @@ sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 from centris import scrape_centris
+from terrains import scrape_terrains
 from analyzer import analyze_all
 
-DATA_FILE = Path(__file__).parent.parent / "app" / "listings.json"
+DATA_FILE     = Path(__file__).parent.parent / "app" / "listings.json"
+TERRAINS_FILE = Path(__file__).parent.parent / "app" / "terrains.json"
 
 
 def main():
@@ -71,6 +73,19 @@ def main():
             print(f"  {i}. {l.get('address','N/A')} — {l.get('type','')} — ${l.get('price',0):,} — {cf:+,.0f}$/mois")
 
     print("=" * 50)
+    print()
+    # 4. Scraper les terrains
+    print()
+    print("Étape 3 — Scraping terrains résidentiels...")
+    terrains = scrape_terrains()
+    terrains_payload = {
+        "scraped_at": datetime.now().isoformat(),
+        "count":      len(terrains),
+        "terrains":   terrains,
+    }
+    with open(TERRAINS_FILE, "w", encoding="utf-8") as f:
+        json.dump(terrains_payload, f, ensure_ascii=False, indent=2)
+    print(f"  {len(terrains)} terrains < 40 000$/log. sauvegardés")
     print()
     print("  Ouvre serve.bat puis va sur http://localhost:8080")
 

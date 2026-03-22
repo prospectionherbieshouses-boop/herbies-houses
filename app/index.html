@@ -363,6 +363,35 @@ body { height: 100%; background: var(--bg); color: var(--text); font-family: var
   </div>
 </div>
 
+<!-- PAGE 4 — TERRAINS -->
+<div class="page" id="page-terrains">
+  <div class="page-header">
+    <div class="page-eyebrow" id="terrainsEyebrow">Centris · Terrains résidentiels</div>
+    <div class="page-title">Terrains à<br>développer</div>
+  </div>
+
+  <div class="ticker-row">
+    <div class="ticker-chip"><div class="t-label">Seuil</div><div class="t-val gold">&lt; 40k$/log.</div></div>
+    <div class="ticker-chip"><div class="t-label">Estimation</div><div class="t-val">1 log. / 200 m²</div></div>
+    <div class="ticker-chip"><div class="t-label">Zonage</div><div class="t-val">Résidentiel</div></div>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-pill on" onclick="setTerrainFilter('tous',          this)">Tous</button>
+    <button class="filter-pill"    onclick="setTerrainFilter('montreal',      this)">Montréal</button>
+    <button class="filter-pill"    onclick="setTerrainFilter('verdun',        this)">Verdun</button>
+    <button class="filter-pill"    onclick="setTerrainFilter('magog',         this)">Magog</button>
+    <button class="filter-pill"    onclick="setTerrainFilter('bromont',       this)">Bromont</button>
+    <button class="filter-pill"    onclick="setTerrainFilter('cowansville',   this)">Cowansville</button>
+    <button class="filter-pill"    onclick="setTerrainFilter('trois-rivieres',this)">Trois-Rivières</button>
+  </div>
+
+  <div class="deal-grid" id="terrainGrid">
+    <div class="skeleton"><div class="skel-line short"></div><div class="skel-line med"></div><div class="skel-line full"></div></div>
+    <div class="skeleton"><div class="skel-line short"></div><div class="skel-line med"></div><div class="skel-line full"></div></div>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="nav">
   <button class="nav-btn active" onclick="gotoPage('deals', this)">
@@ -370,6 +399,9 @@ body { height: 100%; background: var(--bg); color: var(--text); font-family: var
   </button>
   <button class="nav-btn" onclick="gotoPage('calc', this)">
     <div class="nav-icon">📊</div><div class="nav-label">Calcul</div><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="gotoPage('terrains', this)">
+    <div class="nav-icon">🌿</div><div class="nav-label">Terrains</div><div class="nav-dot"></div>
   </button>
   <button class="nav-btn" onclick="gotoPage('scraper', this)">
     <div class="nav-icon">🔍</div><div class="nav-label">Scraper</div><div class="nav-dot"></div>
@@ -610,8 +642,81 @@ function calc() {
   });
 }
 
+// ── Terrains ──────────────────────────────────────────────────────────────────
+let allTerrains      = [];
+let activeTerrainFilter = 'tous';
+
+function setTerrainFilter(f, btn) {
+  activeTerrainFilter = f;
+  document.querySelectorAll('#page-terrains .filter-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderTerrains();
+}
+
+function renderTerrains() {
+  const grid = document.getElementById('terrainGrid');
+  let list   = allTerrains;
+  if (activeTerrainFilter !== 'tous') {
+    list = allTerrains.filter(t => (t.address||'').toLowerCase().includes(activeTerrainFilter) || (t.city||'').toLowerCase().includes(activeTerrainFilter));
+  }
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌿</div>
+        <div class="empty-title">Aucun terrain trouvé</div>
+        <div class="empty-sub">Lance scraper.bat pour chercher<br>les terrains à développer.</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  list.forEach((t, i) => {
+    const ppu   = t.price_per_unit;
+    const units = t.potential_units;
+    const addr  = t.address || t.city || '—';
+    const parts = addr.split(',');
+    const street = parts[0].trim();
+    const hood   = parts.slice(1).join(',').trim() || t.city || '';
+
+    const el = document.createElement('div');
+    el.className = 'deal-tile pos';
+    el.style.animationDelay = (i * 0.04) + 's';
+    el.innerHTML = `
+      <div class="tile-top">
+        <div class="tile-type">Terrain · ${t.city || ''}</div>
+        <div class="tile-badge pos">${ppu ? fmt(ppu) + ' $/log.' : 'N/A'}</div>
+      </div>
+      <div class="tile-addr">${street}</div>
+      <div class="tile-hood">${hood}</div>
+      <div class="tile-stats">
+        <div class="tile-stat"><div class="s-label">Prix</div><div class="s-val">${(t.price/1000).toFixed(0)}k$</div></div>
+        <div class="tile-stat"><div class="s-label">Superficie</div><div class="s-val">${t.area_m2 ? t.area_m2 + ' m²' : t.dimensions || '—'}</div></div>
+        <div class="tile-stat"><div class="s-label">Log. potentiels</div><div class="s-val">${units || '—'}</div></div>
+      </div>`;
+    el.onclick = () => window.open(t.url, '_blank');
+    grid.appendChild(el);
+  });
+}
+
+async function fetchTerrains() {
+  try {
+    const r    = await fetch('terrains.json?t=' + Date.now());
+    const data = await r.json();
+    allTerrains = data.terrains || [];
+    const n    = allTerrains.length;
+    const date = data.scraped_at ? new Date(data.scraped_at).toLocaleDateString('fr-CA') : 'jamais';
+    document.getElementById('terrainsEyebrow').textContent = `Centris · ${n} terrain${n>1?'s':''} · ${date}`;
+    renderTerrains();
+  } catch(e) {
+    document.getElementById('terrainsEyebrow').textContent = 'Terrains · Lance scraper.bat';
+    renderTerrains();
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 fetchListings();
+fetchTerrains();
 calc();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
