@@ -61,10 +61,6 @@ def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
                     "Values": ["Plex"]
                 },
                 {
-                    "Name": "Municipality",
-                    "Values": ["Montréal"]
-                },
-                {
                     "Name": "SalePrice",
                     "Values": ["0", str(max_price)],
                     "RangeMin": "0",
