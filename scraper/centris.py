@@ -41,11 +41,22 @@ def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
         "Referer": BASE_URL + "/fr",
     })
 
-    # Étape 1 — Charger la page pour obtenir les cookies de session
+    # Étape 1 — Charger la page pour obtenir les cookies + token CSRF
     print("  Connexion à Centris...")
     try:
-        session.get(BASE_URL + "/fr", timeout=20)
+        resp_home = session.get(BASE_URL + "/fr", timeout=20)
         time.sleep(2)
+        # Extraire le token CSRF requis par l'API
+        soup_home = BeautifulSoup(resp_home.text, "html.parser")
+        token_el  = soup_home.find("input", {"name": "__RequestVerificationToken"})
+        if not token_el:
+            token_el = soup_home.find("meta", {"name": "__RequestVerificationToken"})
+        csrf_token = token_el["value"] if token_el else ""
+        if csrf_token:
+            HEADERS["RequestVerificationToken"] = csrf_token
+            print(f"  Token CSRF obtenu : {csrf_token[:20]}...")
+        else:
+            print("  Avertissement : token CSRF non trouvé")
     except Exception as e:
         print(f"  Erreur connexion: {e}")
         return []
