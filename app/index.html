@@ -488,6 +488,17 @@ function renderDeals() {
         <div class="tile-stat"><div class="s-label">Cap rate</div><div class="s-val">${cap.toFixed(1)}%</div></div>
       </div>`;
     el.onclick = () => loadToCalc(d);
+
+    // Bouton lien Centris
+    const link = document.createElement('a');
+    link.href = d.url || '#';
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.style.cssText = 'display:block;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--gold);text-decoration:none;opacity:.7';
+    link.textContent = 'Voir sur Centris →';
+    link.onclick = e => e.stopPropagation();
+    el.appendChild(link);
+
     grid.appendChild(el);
   });
 }
