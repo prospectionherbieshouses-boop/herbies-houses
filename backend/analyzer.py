@@ -176,10 +176,16 @@ def analyze_listing(listing: dict) -> dict:
 
 
 def analyze_all(listings: list[dict]) -> list[dict]:
-    """Analyser toutes les annonces et retourner triées par score décroissant."""
+    """Analyser les annonces avec revenus déclarés seulement, triées par score."""
     results = []
+    discarded = 0
     for listing in listings:
+        if not listing.get("declared_income"):
+            discarded += 1
+            continue
         analysis = analyze_listing(listing)
         results.append({**listing, **analysis})
+    if discarded:
+        print(f"  {discarded} annonces sans revenus déclarés — ignorées")
     results.sort(key=lambda x: x.get("score", 0), reverse=True)
     return results
