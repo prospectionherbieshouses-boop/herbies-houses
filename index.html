@@ -1,765 +1,627 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#6366f1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Herbies">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.svg">
-  <title>Herbies — Deals Immo</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Herbies">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<title>Herbies — Immo MTL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    :root {
-      --purple:   #6366f1;
-      --purple-d: #4f46e5;
-      --green:    #22c55e;
-      --yellow:   #f59e0b;
-      --red:      #ef4444;
-      --bg:       #f8fafc;
-      --card:     #ffffff;
-      --border:   #e2e8f0;
-      --text:     #1e293b;
-      --muted:    #64748b;
-      --radius:   12px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
-    }
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-
-    /* ── Layout ── */
-    #app { display: flex; flex-direction: column; height: 100%; }
-
-    header {
-      background: var(--purple);
-      color: white;
-      padding: calc(16px + var(--safe-top)) 20px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    header h1 { font-size: 20px; font-weight: 700; }
-    header .subtitle { font-size: 12px; opacity: .75; margin-top: 2px; }
-
-    .content { flex: 1; overflow-y: auto; padding: 16px; }
-
-    nav {
-      display: flex;
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      padding-bottom: var(--safe-bot);
-      flex-shrink: 0;
-    }
-    nav button {
-      flex: 1;
-      border: none;
-      background: none;
-      padding: 10px 4px 8px;
-      font-size: 11px;
-      color: var(--muted);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      transition: color .15s;
-    }
-    nav button.active { color: var(--purple); }
-    nav button svg { width: 22px; height: 22px; }
-
-    /* ── Tabs ── */
-    .tab { display: none; }
-    .tab.active { display: block; }
-
-    /* ── Toolbar ── */
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .toolbar select, .toolbar input {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 14px;
-      background: var(--card);
-      color: var(--text);
-      flex: 1;
-      min-width: 0;
-    }
-    .btn {
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity .15s;
-    }
-    .btn:active { opacity: .8; }
-    .btn-primary { background: var(--purple); color: white; }
-    .btn-secondary { background: var(--border); color: var(--text); }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    .card-img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      background: #e2e8f0;
-      display: block;
-    }
-    .card-img-placeholder {
-      width: 100%;
-      height: 160px;
-      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-    }
-    .card-body { padding: 14px; }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-    .card-type { font-size: 12px; font-weight: 600; color: var(--purple); background: #eef2ff; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-    .card-score { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-    .score-high { background: #dcfce7; color: #166534; }
-    .score-mid  { background: #fef9c3; color: #713f12; }
-    .score-low  { background: #fee2e2; color: #991b1b; }
-    .card-address { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-    .card-price { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
-
-    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-    .metric { background: var(--bg); border-radius: 8px; padding: 8px; text-align: center; }
-    .metric-val { font-size: 16px; font-weight: 700; }
-    .metric-val.positive { color: var(--green); }
-    .metric-val.negative { color: var(--red); }
-    .metric-val.neutral  { color: var(--yellow); }
-    .metric-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-    .card-footer { display: flex; gap: 8px; }
-    .card-footer a { flex: 1; text-align: center; }
-
-    /* ── Simulateur ── */
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
-    .form-group input, .form-group select {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 15px;
-      background: var(--card);
-      color: var(--text);
-    }
-    .form-group input:focus, .form-group select:focus { outline: 2px solid var(--purple); border-color: transparent; }
-
-    .result-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 20px;
-    }
-    .result-box h3 { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
-    .result-cashflow {
-      font-size: 36px;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 4px;
-    }
-    .result-sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .result-rows {}
-    .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-    .result-row:last-child { border-bottom: none; }
-    .result-row .label { color: var(--muted); }
-    .result-row .value { font-weight: 600; }
-    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; justify-content: center; }
-    .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .badge-ok  { background: #dcfce7; color: #166534; }
-    .badge-bad { background: #fee2e2; color: #991b1b; }
-
-    /* ── Alertes ── */
-    .section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 12px; }
-    .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    .settings-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .settings-row:last-child { border-bottom: none; }
-    .settings-label { font-size: 15px; }
-    .settings-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute; inset: 0;
-      background: var(--border);
-      border-radius: 26px;
-      cursor: pointer;
-      transition: background .2s;
-    }
-    .toggle-slider::before {
-      content: '';
-      position: absolute;
-      width: 20px; height: 20px;
-      left: 3px; bottom: 3px;
-      background: white;
-      border-radius: 50%;
-      transition: transform .2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,.2);
-    }
-    .toggle input:checked + .toggle-slider { background: var(--purple); }
-    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
-
-    /* ── Empty state ── */
-    .empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-    .empty-icon { font-size: 48px; margin-bottom: 16px; }
-    .empty h3 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-    .empty p { font-size: 14px; }
-
-    /* ── Scraper status banner ── */
-    .scraper-banner {
-      background: #fef9c3;
-      border: 1px solid #fde68a;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .scraper-banner.running { background: #eef2ff; border-color: #c7d2fe; }
-    .spinner { animation: spin 1s linear infinite; display: inline-block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Loaders ── */
-    .skeleton {
-      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 6px;
-    }
-    @keyframes shimmer { to { background-position: -200% 0; } }
-  </style>
-</head>
-<body>
-<div id="app">
-
-  <!-- Header -->
-  <header>
-    <div>
-      <h1>🏠 Herbies</h1>
-      <div class="subtitle" id="header-sub">Deals immobiliers Montréal</div>
-    </div>
-    <button class="btn btn-primary" id="btn-scrape" onclick="triggerScrape()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0 1 15.4-6M20 15a9 9 0 0 1-15.4 6"/></svg>
-      Scraper
-    </button>
-  </header>
-
-  <!-- Content area -->
-  <div class="content">
-
-    <!-- Tab: Deals -->
-    <div class="tab active" id="tab-deals">
-      <div id="scraper-status-banner" style="display:none"></div>
-
-      <div class="toolbar">
-        <select id="filter-sort" onchange="renderDeals()">
-          <option value="score">Trier par score</option>
-          <option value="cashflow_monthly">Trier par cashflow</option>
-          <option value="price">Trier par prix</option>
-          <option value="cap_rate_pct">Trier par cap rate</option>
-        </select>
-        <select id="filter-min-cf" onchange="renderDeals()">
-          <option value="0">Tous les cashflows</option>
-          <option value="1">Cashflow positif</option>
-          <option value="200">Cashflow ≥ 200$/mois</option>
-          <option value="400">Cashflow ≥ 400$/mois</option>
-        </select>
-      </div>
-
-      <div id="deals-list"></div>
-    </div>
-
-    <!-- Tab: Simulateur -->
-    <div class="tab" id="tab-sim">
-      <div class="form-group">
-        <label>Prix demandé ($)</label>
-        <input type="number" id="sim-price" value="700000" min="100000" step="10000">
-      </div>
-      <div class="form-group">
-        <label>Nombre de logements</label>
-        <select id="sim-units">
-          <option value="2">Duplex (2)</option>
-          <option value="3" selected>Triplex (3)</option>
-          <option value="4">Quadruplex (4)</option>
-          <option value="5">Quintuplex (5)</option>
-          <option value="6">6-plex</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Revenus bruts mensuels ($) — optionnel</label>
-        <input type="number" id="sim-income" placeholder="Laissez vide pour estimer" min="0" step="100">
-      </div>
-      <div class="form-group">
-        <label>Taux hypothécaire (%)</label>
-        <input type="number" id="sim-rate" value="4.69" min="0.1" max="20" step="0.01">
-      </div>
-      <div class="form-group">
-        <label>Mise de fonds (%)</label>
-        <input type="number" id="sim-down" value="20" min="5" max="50" step="1">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="runSimulation()">
-        Calculer le cashflow
-      </button>
-      <div id="sim-result"></div>
-    </div>
-
-    <!-- Tab: Alertes -->
-    <div class="tab" id="tab-alerts">
-      <div class="section-title">Notifications</div>
-      <div class="settings-card">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Alertes email</div>
-            <div class="settings-sub">Nouveaux deals avec cashflow positif</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" id="notif-email" checked>
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Seuil cashflow minimum</div>
-            <div class="settings-sub">Ne notifier que si ≥ ce montant</div>
-          </div>
-          <select id="notif-threshold" style="width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px">
-            <option value="0">0 $/mois</option>
-            <option value="200" selected>200 $/mois</option>
-            <option value="400">400 $/mois</option>
-            <option value="600">600 $/mois</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="section-title">Filtres de recherche</div>
-      <div class="settings-card">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Prix maximum</div>
-          </div>
-          <select id="filter-max-price" style="width:140px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px">
-            <option value="1000000">1 M$</option>
-            <option value="1500000" selected>1,5 M$</option>
-            <option value="2000000">2 M$</option>
-          </select>
-        </div>
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">Types de propriétés</div>
-          </div>
-          <div style="font-size:13px;color:var(--muted)">Duplex → 6-plex</div>
-        </div>
-      </div>
-
-      <div class="section-title">API Backend</div>
-      <div class="settings-card">
-        <div class="settings-row">
-          <div>
-            <div class="settings-label">URL du backend</div>
-            <div class="settings-sub" id="api-status-text">Non connecté</div>
-          </div>
-          <button class="btn btn-secondary" onclick="testConnection()" style="font-size:12px;padding:6px 12px">Tester</button>
-        </div>
-        <div class="settings-row">
-          <div style="flex:1">
-            <input type="text" id="api-url" value="http://localhost:8000"
-              style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px">
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:24px;text-align:center">
-        <p style="font-size:12px;color:var(--muted)">Taux utilisés : fixe 4,69% · variable 3,95%</p>
-        <p style="font-size:12px;color:var(--muted)">Mise de fonds : 20% · Vacance : 3%</p>
-        <p style="font-size:11px;color:#cbd5e1;margin-top:8px">Herbies Houses v1.0 — Mars 2026</p>
-      </div>
-    </div>
-
-  </div><!-- /content -->
-
-  <!-- Bottom nav -->
-  <nav>
-    <button class="active" id="nav-deals" onclick="switchTab('deals')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Deals
-    </button>
-    <button id="nav-sim" onclick="switchTab('sim')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      Simulateur
-    </button>
-    <button id="nav-alerts" onclick="switchTab('alerts')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      Alertes
-    </button>
-  </nav>
-
-</div><!-- /app -->
-
-<script>
-// ── Config ──────────────────────────────────────────────────────────────────
-let API_URL    = localStorage.getItem('api_url') || 'https://web-production-ca9a1.up.railway.app';
-let listings   = JSON.parse(localStorage.getItem('listings') || '[]');
-let scrapeTimer = null;
-
-// Charger l'URL depuis l'input
-document.getElementById('api-url').value = API_URL;
-document.getElementById('api-url').addEventListener('change', e => {
-  API_URL = e.target.value.replace(/\/$/, '');
-  localStorage.setItem('api_url', API_URL);
-});
-
-// ── Navigation ───────────────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
+:root {
+  --bg:       #0a0a0c;
+  --surface:  #111114;
+  --surface2: #18181d;
+  --surface3: #1e1e25;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --gold:     #d4a853;
+  --gold2:    #e8c17a;
+  --gold-dim: rgba(212,168,83,0.1);
+  --gold-glow:rgba(212,168,83,0.05);
+  --text:     #f0ede8;
+  --text2:    #7a7670;
+  --text3:    #3d3b38;
+  --green:    #52c98a;
+  --green-d:  rgba(82,201,138,0.1);
+  --red:      #e05c5c;
+  --red-d:    rgba(224,92,92,0.1);
+  --safe:     env(safe-area-inset-bottom, 0px);
+  --serif:    'Instrument Serif', Georgia, serif;
+  --mono:     'DM Mono', monospace;
+  --sans:     'Plus Jakarta Sans', sans-serif;
+  --radius:   16px;
+  --nav-h:    64px;
 }
 
-// ── Deals ────────────────────────────────────────────────────────────────────
-async function loadDeals() {
-  const sortBy   = document.getElementById('filter-sort').value;
-  const minCf    = document.getElementById('filter-min-cf').value;
-  const maxPrice = document.getElementById('filter-max-price')?.value || 2000000;
+html { height: 100%; background: var(--bg); }
+body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-  try {
-    const res = await fetch(`${API_URL}/listings?sort_by=${sortBy}&min_cashflow=${minCf}&max_price=${maxPrice}`);
-    if (!res.ok) throw new Error(res.statusText);
-    const data = await res.json();
-    listings = data.listings || [];
-    localStorage.setItem('listings', JSON.stringify(listings));
-    updateHeaderSub(data.count, data.scraped_at);
-    renderDeals();
-  } catch (e) {
-    // Afficher les données en cache si disponibles
-    if (listings.length) {
-      renderDeals();
-      showBanner('warning', '⚠️ Backend non connecté — données en cache');
-    } else {
-      renderEmpty();
-    }
-  }
+/* ── Nav ── */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe));
+  background: rgba(10,10,12,0.92); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-around;
+  padding-top: 8px; z-index: 100;
+}
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 20px; background: none; border: none; cursor: pointer; transition: all 0.2s; }
+.nav-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: transform 0.2s; }
+.nav-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--text2); transition: color 0.2s; }
+.nav-btn.active .nav-label { color: var(--gold); }
+.nav-btn.active .nav-icon { transform: scale(1.1); }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); margin-top: 2px; opacity: 0; transition: opacity 0.2s; }
+.nav-btn.active .nav-dot { opacity: 1; }
+
+/* ── Pages ── */
+.page {
+  position: fixed; inset: 0;
+  bottom: calc(var(--nav-h) + var(--safe));
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0; pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.page.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.page::-webkit-scrollbar { display: none; }
+
+/* ── Page header ── */
+.page-header { padding: 56px 20px 16px; position: sticky; top: 0; z-index: 10; background: linear-gradient(to bottom, var(--bg) 80%, transparent); }
+.page-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+.page-title { font-family: var(--serif); font-size: 28px; font-weight: 400; color: var(--text); line-height: 1.15; font-style: italic; }
+
+/* ── Ticker ── */
+.ticker-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 16px; -webkit-overflow-scrolling: touch; }
+.ticker-row::-webkit-scrollbar { display: none; }
+.ticker-chip { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: var(--mono); font-size: 10px; }
+.ticker-chip .t-label { color: var(--text2); margin-bottom: 2px; }
+.ticker-chip .t-val { color: var(--text); font-weight: 500; font-size: 13px; }
+.ticker-chip .t-val.gold { color: var(--gold); }
+.ticker-chip .t-val.green { color: var(--green); }
+
+/* ── Filters ── */
+.filter-row { display: flex; gap: 6px; padding: 0 20px 16px; overflow-x: auto; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-pill { flex-shrink: 0; font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+.filter-pill.on { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+/* ── Deal tiles ── */
+.deal-grid { padding: 0 14px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
+.deal-tile {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  animation: tileIn 0.3s ease both;
+  position: relative; overflow: hidden;
+}
+.deal-tile::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 3px 0 0 3px; }
+.deal-tile.pos::before { background: var(--green); }
+.deal-tile.neg::before { background: var(--red); }
+.deal-tile:active { transform: scale(0.98); }
+@keyframes tileIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+.tile-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.tile-type { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--gold); text-transform: uppercase; }
+.tile-badge { font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; }
+.tile-badge.pos { background: var(--green-d); color: var(--green); }
+.tile-badge.neg { background: var(--red-d); color: var(--red); }
+.tile-addr { font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile-hood { font-size: 12px; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tile-declared { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; padding: 2px 6px; border-radius: 4px; background: var(--green-d); color: var(--green); }
+.tile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.tile-stat .s-label { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-bottom: 2px; }
+.tile-stat .s-val { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text); }
+
+/* ── Score badge ── */
+.score-badge { position: absolute; top: 14px; right: 56px; font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 5px; }
+.score-badge.hi  { background: rgba(82,201,138,0.15); color: var(--green); }
+.score-badge.mid { background: var(--gold-dim); color: var(--gold); }
+.score-badge.lo  { background: var(--red-d); color: var(--red); }
+
+/* ── Skeleton ── */
+.skeleton { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.skel-line { height: 10px; border-radius: 4px; background: var(--surface3); margin-bottom: 10px; animation: shimmer 1.4s infinite; }
+.skel-line.short { width: 40%; }
+.skel-line.med { width: 65%; }
+.skel-line.full { width: 100%; }
+@keyframes shimmer { 0%,100%{opacity:.4} 50%{opacity:.9} }
+
+/* ── Empty state ── */
+.empty-state { text-align: center; padding: 60px 30px; }
+.empty-icon { font-size: 40px; margin-bottom: 16px; opacity: .5; }
+.empty-title { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--text2); margin-bottom: 8px; }
+.empty-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); line-height: 1.8; }
+
+/* ── Calculateur ── */
+#page-calc { padding: 56px 0 20px; }
+.calc-header { padding: 0 20px 20px; }
+.calc-scroll { padding: 0 14px; }
+.calc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+.calc-card-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+.input-field { margin-bottom: 14px; }
+.input-field:last-child { margin-bottom: 0; }
+.input-field label { font-family: var(--mono); font-size: 10px; color: var(--text2); display: block; margin-bottom: 6px; }
+.input-field input, .input-field select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: var(--mono); font-size: 15px; padding: 12px 14px; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
+.input-field input:focus { border-color: rgba(212,168,83,0.4); }
+
+.result-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin: 0 14px 12px; text-align: center; position: relative; overflow: hidden; }
+.result-hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at top, var(--gold-glow), transparent 60%); pointer-events: none; }
+.result-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text2); text-transform: uppercase; margin-bottom: 8px; }
+.result-amount { font-family: var(--serif); font-size: 48px; font-style: italic; line-height: 1; margin-bottom: 4px; transition: color 0.3s; }
+.result-amount.pos { color: var(--green); }
+.result-amount.neg { color: var(--red); }
+.result-amount.zero { color: var(--text2); }
+.result-period { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+
+.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px; margin-bottom: 12px; }
+.metric-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.metric-tile .m-label { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-bottom: 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+.metric-tile .m-val { font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--text); }
+.metric-tile .m-val.green { color: var(--green); }
+.metric-tile .m-val.red { color: var(--red); }
+.metric-tile .m-val.gold { color: var(--gold); }
+
+.breakdown-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 0 14px 12px; }
+.bk-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 12px; }
+.bk-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 12px; }
+.bk-row:last-child { border-bottom: none; }
+.bk-row .bk-label { color: var(--text2); }
+.bk-row .bk-val { color: var(--text); font-weight: 500; }
+.bk-row .bk-val.total { color: var(--gold); font-size: 13px; }
+
+.bar-section { padding: 0 14px 12px; }
+.bar-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 10px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 70px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s cubic-bezier(.4,0,.2,1); min-height: 2px; }
+.bar-year { font-family: var(--mono); font-size: 8px; color: var(--text3); }
+
+.verdict-banner { margin: 0 14px 12px; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid; transition: all 0.3s; }
+.verdict-banner.good { background: var(--green-d); border-color: rgba(82,201,138,0.2); }
+.verdict-banner.bad  { background: var(--red-d); border-color: rgba(224,92,92,0.2); }
+.verdict-banner.meh  { background: var(--gold-dim); border-color: rgba(212,168,83,0.2); }
+.verdict-icon { font-size: 20px; }
+.verdict-text .v-title { font-family: var(--sans); font-size: 13px; font-weight: 600; margin-bottom: 1px; }
+.verdict-banner.good .v-title { color: var(--green); }
+.verdict-banner.bad  .v-title { color: var(--red); }
+.verdict-banner.meh  .v-title { color: var(--gold); }
+.verdict-text .v-sub { font-family: var(--mono); font-size: 10px; color: var(--text2); }
+
+/* ── Scraper ── */
+#page-scraper { padding: 56px 0 20px; }
+.scraper-card { margin: 0 14px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.scraper-status { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.status-led { width: 10px; height: 10px; border-radius: 50%; background: var(--text3); flex-shrink: 0; transition: background 0.3s, box-shadow 0.3s; }
+.status-led.running { background: var(--green); box-shadow: 0 0 10px var(--green); animation: blink 1s ease-in-out infinite; }
+.status-led.idle { background: var(--text3); }
+.status-led.error { background: var(--red); box-shadow: 0 0 10px var(--red); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.status-info .s-state { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--text); }
+.status-info .s-sub { font-family: var(--mono); font-size: 10px; color: var(--text2); }
+.run-btn { width: 100%; background: var(--gold); border: none; border-radius: 12px; color: #0a0a0c; font-family: var(--sans); font-size: 15px; font-weight: 700; padding: 16px; cursor: pointer; transition: all 0.15s; margin-bottom: 12px; }
+.run-btn:active { transform: scale(0.97); background: var(--gold2); }
+.run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+.stat-box .sb-val { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--text); display: block; }
+.stat-box .sb-label { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.06em; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 — DEALS -->
+<div class="page active" id="page-deals">
+  <div class="page-header">
+    <div class="page-eyebrow" id="dealsEyebrow">Centris · Chargement...</div>
+    <div class="page-title">Deals à<br>cashflow positif</div>
+  </div>
+
+  <div class="ticker-row">
+    <div class="ticker-chip"><div class="t-label">Taux directeur</div><div class="t-val gold">2,25 %</div></div>
+    <div class="ticker-chip"><div class="t-label">Taux préférentiel</div><div class="t-val">4,45 %</div></div>
+    <div class="ticker-chip"><div class="t-label">Fixe 5 ans</div><div class="t-val">4,69 %</div></div>
+    <div class="ticker-chip"><div class="t-label">Inflation</div><div class="t-val green">1,8 %</div></div>
+    <div class="ticker-chip"><div class="t-label">BdC prochain</div><div class="t-val">29 avr.</div></div>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-pill on"  onclick="setFilter('tous',          this)">Tous</button>
+    <button class="filter-pill"     onclick="setFilter('positif',       this)">Cashflow +</button>
+    <button class="filter-pill"     onclick="setFilter('duplex',        this)">Duplex</button>
+    <button class="filter-pill"     onclick="setFilter('triplex',       this)">Triplex</button>
+    <button class="filter-pill"     onclick="setFilter('multi',         this)">4+ log.</button>
+    <button class="filter-pill"     onclick="setFilter('montreal',      this)">Montréal</button>
+    <button class="filter-pill"     onclick="setFilter('verdun',        this)">Verdun</button>
+    <button class="filter-pill"     onclick="setFilter('magog',         this)">Magog</button>
+    <button class="filter-pill"     onclick="setFilter('bromont',       this)">Bromont</button>
+    <button class="filter-pill"     onclick="setFilter('cowansville',   this)">Cowansville</button>
+    <button class="filter-pill"     onclick="setFilter('trois-rivieres',this)">Trois-Rivières</button>
+  </div>
+
+  <div class="deal-grid" id="dealGrid">
+    <div class="skeleton"><div class="skel-line short"></div><div class="skel-line med"></div><div class="skel-line full"></div></div>
+    <div class="skeleton"><div class="skel-line short"></div><div class="skel-line med"></div><div class="skel-line full"></div></div>
+    <div class="skeleton"><div class="skel-line short"></div><div class="skel-line med"></div><div class="skel-line full"></div></div>
+  </div>
+</div>
+
+<!-- PAGE 2 — CALCULATEUR -->
+<div class="page" id="page-calc">
+  <div class="calc-header">
+    <div class="page-eyebrow">Analyse financière</div>
+    <div class="page-title">Calculateur<br><em>cashflow</em></div>
+  </div>
+
+  <div class="result-hero">
+    <div class="result-label">Cashflow mensuel estimé</div>
+    <div class="result-amount zero" id="heroAmount">+0 $</div>
+    <div class="result-period">après hypothèque + charges</div>
+  </div>
+
+  <div class="verdict-banner meh" id="verdictBanner">
+    <div class="verdict-icon">—</div>
+    <div class="verdict-text">
+      <div class="v-title" id="verdictTitle">Entrez les données</div>
+      <div class="v-sub" id="verdictSub">Le résultat apparaîtra ici</div>
+    </div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-tile"><div class="m-label">Cap rate</div><div class="m-val gold" id="mCap">—</div></div>
+    <div class="metric-tile"><div class="m-label">MRB</div><div class="m-val" id="mMrb">—</div></div>
+    <div class="metric-tile"><div class="m-label">Cashflow annuel</div><div class="m-val" id="mAnnuel">—</div></div>
+    <div class="metric-tile"><div class="m-label">Hypothèque/mois</div><div class="m-val" id="mHypo">—</div></div>
+  </div>
+
+  <div class="calc-scroll">
+    <div class="calc-card">
+      <div class="calc-card-label">Propriété</div>
+      <div class="input-field"><label>Prix d'achat ($)</label><input type="number" id="cPrix" value="875000" inputmode="numeric" oninput="calc()"></div>
+      <div class="input-field"><label>Mise de fonds (%)</label><input type="number" id="cMdf" value="20" min="5" max="50" inputmode="decimal" oninput="calc()"></div>
+      <div class="input-field"><label>Amortissement</label>
+        <select id="cAmort" onchange="calc()">
+          <option value="20">20 ans</option>
+          <option value="25" selected>25 ans</option>
+          <option value="30">30 ans (SCHL 5+)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-label">Revenus & taux</div>
+      <div class="input-field"><label>Revenus locatifs bruts ($/mois)</label><input type="number" id="cRevenu" value="4600" inputmode="numeric" oninput="calc()"></div>
+      <div class="input-field"><label>Taux hypothécaire (%)</label><input type="number" id="cTaux" value="4.69" step="0.05" inputmode="decimal" oninput="calc()"></div>
+      <div class="input-field"><label>Taux de vacance (%)</label><input type="number" id="cVacance" value="3" inputmode="decimal" oninput="calc()"></div>
+    </div>
+
+    <div class="breakdown-card">
+      <div class="bk-title">Détail mensuel</div>
+      <div id="bkRows"></div>
+    </div>
+
+    <div class="bar-section">
+      <div class="bar-title">Projection cashflow 5 ans (+3 % croissance loyers)</div>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 — SCRAPER -->
+<div class="page" id="page-scraper">
+  <div class="calc-header">
+    <div class="page-eyebrow">Centris · 6 villes</div>
+    <div class="page-title">Scraper<br><em>automatique</em></div>
+  </div>
+
+  <div style="padding:0 14px">
+    <div class="stats-row" style="margin-bottom:12px">
+      <div class="stat-box"><span class="sb-val" id="statTotal">—</span><span class="sb-label">annonces</span></div>
+      <div class="stat-box"><span class="sb-val" id="statPos" style="color:var(--green)">—</span><span class="sb-label">cashflow +</span></div>
+      <div class="stat-box"><span class="sb-val" id="statScore" style="color:var(--gold)">—</span><span class="sb-label">score moy.</span></div>
+    </div>
+
+    <div class="scraper-card">
+      <div class="scraper-status">
+        <div class="status-led idle" id="statusLed"></div>
+        <div class="status-info">
+          <div class="s-state" id="statusState">En attente</div>
+          <div class="s-sub" id="statusSub">Dernier scan : jamais</div>
+        </div>
+      </div>
+      <button class="run-btn" id="runBtn" onclick="triggerScraper()">Lancer le scraper</button>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;margin-top:-4px">
+        Lance scraper.bat sur ton laptop pour de meilleurs résultats
+      </div>
+    </div>
+
+    <div class="scraper-card" style="padding:14px">
+      <div class="bk-title" style="margin-bottom:10px">Villes scrapées</div>
+      <div id="villesList">
+        <div class="bk-row"><span class="bk-label">Montréal</span><span class="bk-val" style="color:var(--text3)">—</span></div>
+        <div class="bk-row"><span class="bk-label">Verdun</span><span class="bk-val" style="color:var(--text3)">—</span></div>
+        <div class="bk-row"><span class="bk-label">Cowansville</span><span class="bk-val" style="color:var(--text3)">—</span></div>
+        <div class="bk-row"><span class="bk-label">Magog</span><span class="bk-val" style="color:var(--text3)">—</span></div>
+        <div class="bk-row"><span class="bk-label">Bromont</span><span class="bk-val" style="color:var(--text3)">—</span></div>
+        <div class="bk-row"><span class="bk-label">Trois-Rivières</span><span class="bk-val" style="color:var(--text3)">—</span></div>
+      </div>
+    </div>
+
+    <div class="scraper-card" style="padding:14px">
+      <div class="bk-title" style="margin-bottom:10px">Top deals actuels</div>
+      <div id="topDeals"><span style="font-family:var(--mono);font-size:10px;color:var(--text3)">Lance un scrape pour voir les deals</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="gotoPage('deals', this)">
+    <div class="nav-icon">🏠</div><div class="nav-label">Deals</div><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="gotoPage('calc', this)">
+    <div class="nav-icon">📊</div><div class="nav-label">Calcul</div><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" onclick="gotoPage('scraper', this)">
+    <div class="nav-icon">🔍</div><div class="nav-label">Scraper</div><div class="nav-dot"></div>
+  </button>
+</nav>
+
+<script>
+const API_URL = localStorage.getItem('api_url') || 'https://web-production-ca9a1.up.railway.app';
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function gotoPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Deals ─────────────────────────────────────────────────────────────────────
+let allListings  = [];
+let activeFilter = 'tous';
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderDeals();
+}
+
+function filterListings(listings) {
+  if (activeFilter === 'tous')          return listings;
+  if (activeFilter === 'positif')       return listings.filter(d => (d.cashflow_monthly||0) > 0);
+  if (activeFilter === 'duplex')        return listings.filter(d => (d.type||'').toLowerCase().includes('duplex'));
+  if (activeFilter === 'triplex')       return listings.filter(d => (d.type||'').toLowerCase().includes('triplex'));
+  if (activeFilter === 'multi')         return listings.filter(d => (d.units||0) >= 4);
+  // city
+  return listings.filter(d => (d.address||'').toLowerCase().includes(activeFilter));
 }
 
 function renderDeals() {
-  const sortBy  = document.getElementById('filter-sort').value;
-  const minCf   = parseInt(document.getElementById('filter-min-cf').value);
+  const grid     = document.getElementById('dealGrid');
+  const filtered = filterListings(allListings);
 
-  let filtered = listings
-    .filter(l => (l.cashflow_monthly || 0) >= minCf)
-    .sort((a, b) => {
-      if (sortBy === 'mrb') return (a[sortBy] || 999) - (b[sortBy] || 999);
-      return (b[sortBy] || 0) - (a[sortBy] || 0);
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🏚</div>
+        <div class="empty-title">Aucun deal trouvé</div>
+        <div class="empty-sub">Lance scraper.bat sur ton laptop<br>pour récupérer les annonces Centris.</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  filtered.forEach((d, i) => {
+    const cf     = d.cashflow_monthly || 0;
+    const pos    = cf >= 0;
+    const addr   = d.address || 'Adresse inconnue';
+    const parts  = addr.split(',');
+    const street = parts[0].trim();
+    const hood   = parts.slice(1).join(',').trim();
+    const prix   = d.price || 0;
+    const revenu = d.gross_rent_monthly || d.declared_income || 0;
+    const cap    = d.cap_rate_pct || 0;
+    const score  = d.score || 0;
+    const scoreClass = score >= 7 ? 'hi' : score >= 5 ? 'mid' : 'lo';
+
+    const el = document.createElement('div');
+    el.className = 'deal-tile ' + (pos ? 'pos' : 'neg');
+    el.style.animationDelay = (i * 0.04) + 's';
+    el.innerHTML = `
+      <div class="score-badge ${scoreClass}">${score}/10</div>
+      <div class="tile-top">
+        <div class="tile-type">${d.type || '—'} · ${d.units || '?'} log.</div>
+        <div class="tile-badge ${pos ? 'pos' : 'neg'}">${pos ? '+' : ''}${fmt(cf)} $/m</div>
+      </div>
+      <div class="tile-addr">${street}</div>
+      <div class="tile-hood">
+        ${hood}
+        ${d.income_declared ? '<span class="tile-declared">revenus déclarés</span>' : ''}
+      </div>
+      <div class="tile-stats">
+        <div class="tile-stat"><div class="s-label">Prix</div><div class="s-val">${(prix/1000).toFixed(0)}k$</div></div>
+        <div class="tile-stat"><div class="s-label">Revenus/m</div><div class="s-val">${fmt(revenu)}$</div></div>
+        <div class="tile-stat"><div class="s-label">Cap rate</div><div class="s-val">${cap.toFixed(1)}%</div></div>
+      </div>`;
+    el.onclick = () => loadToCalc(d);
+    grid.appendChild(el);
+  });
+}
+
+function loadToCalc(d) {
+  document.getElementById('cPrix').value   = d.price || 0;
+  document.getElementById('cRevenu').value = d.gross_rent_monthly || d.declared_income || 0;
+  calc();
+  gotoPage('calc', document.querySelectorAll('.nav-btn')[1]);
+}
+
+async function fetchListings() {
+  try {
+    const r    = await fetch(`${API_URL}/listings?sort_by=score&min_cashflow=0&max_price=2000000`);
+    const data = await r.json();
+    allListings = data.listings || [];
+
+    const n    = allListings.length;
+    const date = data.scraped_at ? new Date(data.scraped_at).toLocaleDateString('fr-CA') : 'jamais';
+    document.getElementById('dealsEyebrow').textContent = `Centris · ${n} annonce${n>1?'s':''} · ${date}`;
+    renderDeals();
+    updateScraperPage(data);
+  } catch(e) {
+    document.getElementById('dealsEyebrow').textContent = 'Centris · Hors ligne';
+    renderDeals();
+  }
+}
+
+function updateScraperPage(data) {
+  const listings = data.listings || [];
+  const pos    = listings.filter(l => (l.cashflow_monthly||0) > 0).length;
+  const scores = listings.map(l => l.score||0).filter(s => s > 0);
+  const avg    = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
+
+  document.getElementById('statTotal').textContent = listings.length || '—';
+  document.getElementById('statPos').textContent   = pos || '—';
+  document.getElementById('statScore').textContent = avg;
+
+  if (data.scraped_at) {
+    const d = new Date(data.scraped_at);
+    document.getElementById('statusSub').textContent = `Dernier scan : ${d.toLocaleDateString('fr-CA')} ${d.toLocaleTimeString('fr-CA')}`;
+  }
+
+  // Top deals
+  const top   = listings.slice(0, 5);
+  const topEl = document.getElementById('topDeals');
+  if (top.length) {
+    topEl.innerHTML = top.map(l => {
+      const cf   = l.cashflow_monthly || 0;
+      const addr = (l.address||'').split(',')[0];
+      return `<div class="bk-row" style="cursor:pointer" onclick='loadToCalc(${JSON.stringify(l)})'>
+        <span class="bk-label">${l.type||'—'} · ${addr.substring(0,22)}</span>
+        <span class="bk-val" style="color:${cf>=0?'var(--green)':'var(--red)'}">${cf>=0?'+':''}${fmt(cf)} $/m</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Villes
+  const CITIES = ['Montréal','Verdun','Cowansville','Magog','Bromont','Trois-Rivières'];
+  const byCity = {};
+  listings.forEach(l => {
+    const a = (l.address||'').toLowerCase();
+    CITIES.forEach(c => {
+      const slug = c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      if (a.includes(slug) || a.includes(c.toLowerCase())) byCity[c] = (byCity[c]||0) + 1;
     });
-
-  const el = document.getElementById('deals-list');
-  if (!filtered.length) { renderEmpty(); return; }
-  el.innerHTML = filtered.map(renderCard).join('');
+  });
+  document.getElementById('villesList').innerHTML = CITIES.map(c => {
+    const count = byCity[c] || 0;
+    return `<div class="bk-row">
+      <span class="bk-label">${c}</span>
+      <span class="bk-val" style="color:${count>0?'var(--gold)':'var(--text3)'}">${count > 0 ? count + ' annonce' + (count>1?'s':'') : '—'}</span>
+    </div>`;
+  }).join('');
 }
 
-function renderCard(l) {
-  const cf      = l.cashflow_monthly || 0;
-  const cfColor = cf >= 200 ? 'positive' : cf >= 0 ? 'neutral' : 'negative';
-  const cfSign  = cf >= 0 ? '+' : '';
-  const capRate = (l.cap_rate_pct || 0).toFixed(1);
-  const mrb     = (l.mrb || 0).toFixed(1);
-  const score   = l.score || 0;
-  const scoreClass = score >= 7 ? 'score-high' : score >= 5 ? 'score-mid' : 'score-low';
-  const imgHtml = l.image
-    ? `<img class="card-img" src="${l.image}" alt="${l.address}" loading="lazy" onerror="this.style.display='none'">`
-    : `<div class="card-img-placeholder">🏠</div>`;
-
-  return `
-  <div class="card">
-    ${imgHtml}
-    <div class="card-body">
-      <div class="card-header">
-        <span class="card-type">${l.type || 'Plex'} · ${l.units || '?'} log.</span>
-        <span class="card-score ${scoreClass}">★ ${score}/10</span>
-      </div>
-      <div class="card-address">${l.address || 'Adresse inconnue'}</div>
-      <div class="card-price">${formatPrice(l.price)}</div>
-      <div class="metrics">
-        <div class="metric">
-          <div class="metric-val ${cfColor}">${cfSign}${Math.round(cf)} $</div>
-          <div class="metric-label">cashflow/mois</div>
-        </div>
-        <div class="metric">
-          <div class="metric-val ${parseFloat(capRate) >= 4.5 ? 'positive' : 'negative'}">${capRate}%</div>
-          <div class="metric-label">cap rate</div>
-        </div>
-        <div class="metric">
-          <div class="metric-val ${parseFloat(mrb) <= 15 ? 'positive' : 'negative'}">${mrb}x</div>
-          <div class="metric-label">MRB</div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a href="${l.url || '#'}" target="_blank" class="btn btn-primary" style="font-size:13px;padding:8px">Voir sur Centris →</a>
-        <button class="btn btn-secondary" onclick="simulateFromListing(${JSON.stringify(l).replace(/"/g, '&quot;')})" style="font-size:13px;padding:8px">Simuler</button>
-      </div>
-    </div>
-  </div>`;
+async function triggerScraper() {
+  try {
+    const r = await fetch(`${API_URL}/scrape`, { method: 'POST' });
+    if (r.status === 409) { alert('Scraper déjà en cours.'); return; }
+    document.getElementById('statusState').textContent = 'Scraping en cours...';
+    document.getElementById('statusLed').className = 'status-led running';
+    document.getElementById('runBtn').disabled = true;
+  } catch(e) {
+    alert('Lance scraper.bat directement sur ton laptop.');
+  }
 }
 
-function renderEmpty() {
-  document.getElementById('deals-list').innerHTML = `
-  <div class="empty">
-    <div class="empty-icon">🔍</div>
-    <h3>Aucun deal trouvé</h3>
-    <p>Lance le scraper pour charger les annonces Centris,<br>ou ajuste les filtres.</p>
-    <br>
-    <button class="btn btn-primary" onclick="triggerScrape()">Lancer le scraper</button>
-  </div>`;
-}
+// ── Calculateur ───────────────────────────────────────────────────────────────
+function pmt(r, n, pv) { return r === 0 ? pv/n : pv*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1); }
+function fmt(n) { return Math.round(n).toLocaleString('fr-CA'); }
 
-function updateHeaderSub(count, scrapedAt) {
-  const sub = document.getElementById('header-sub');
-  if (scrapedAt) {
-    const d = new Date(scrapedAt);
-    sub.textContent = `${count} annonces · ${d.toLocaleDateString('fr-CA')}`;
+function calc() {
+  const prix    = parseFloat(document.getElementById('cPrix').value)    || 0;
+  const mdf     = parseFloat(document.getElementById('cMdf').value)     / 100 || 0.2;
+  const amort   = parseInt(document.getElementById('cAmort').value)     || 25;
+  const revenu  = parseFloat(document.getElementById('cRevenu').value)  || 0;
+  const taux    = parseFloat(document.getElementById('cTaux').value)    / 100 || 0.0469;
+  const vacance = parseFloat(document.getElementById('cVacance').value) / 100 || 0.03;
+
+  const pret    = prix * (1 - mdf);
+  const hypoM   = Math.round(pmt(taux/12, amort*12, pret));
+  const taxesM  = Math.round(prix * 0.008 / 12);
+  const assurM  = Math.round(2400 / 12);
+  const entretM = Math.round(prix * 0.01 / 12);
+  const vacM    = Math.round(revenu * vacance);
+  const revNet  = revenu - vacM;
+  const cf      = revNet - hypoM - taxesM - assurM - entretM;
+  const noi     = (revNet - taxesM - assurM - entretM) * 12;
+  const cap     = prix > 0 ? noi/prix*100 : 0;
+  const mrb     = revenu > 0 ? prix/(revenu*12) : 0;
+
+  const heroEl = document.getElementById('heroAmount');
+  heroEl.textContent = (cf >= 0 ? '+' : '') + fmt(cf) + ' $';
+  heroEl.className = 'result-amount ' + (cf > 0 ? 'pos' : cf < 0 ? 'neg' : 'zero');
+
+  document.getElementById('mCap').textContent = cap.toFixed(2) + ' %';
+  document.getElementById('mCap').className = 'm-val ' + (cap >= 5 ? 'green' : cap >= 4 ? 'gold' : 'red');
+  document.getElementById('mMrb').textContent = 'x' + mrb.toFixed(1);
+  document.getElementById('mAnnuel').textContent = (cf >= 0 ? '+' : '') + fmt(cf*12) + ' $';
+  document.getElementById('mAnnuel').className = 'm-val ' + (cf >= 0 ? 'green' : 'red');
+  document.getElementById('mHypo').textContent = fmt(hypoM) + ' $';
+
+  document.getElementById('bkRows').innerHTML = `
+    <div class="bk-row"><span class="bk-label">Loyers bruts</span><span class="bk-val">${fmt(revenu)} $/m</span></div>
+    <div class="bk-row"><span class="bk-label">− Vacance (${(vacance*100).toFixed(0)}%)</span><span class="bk-val">− ${fmt(vacM)} $/m</span></div>
+    <div class="bk-row"><span class="bk-label">− Hypothèque</span><span class="bk-val">− ${fmt(hypoM)} $/m</span></div>
+    <div class="bk-row"><span class="bk-label">− Taxes municipales</span><span class="bk-val">− ${fmt(taxesM)} $/m</span></div>
+    <div class="bk-row"><span class="bk-label">− Assurances</span><span class="bk-val">− ${fmt(assurM)} $/m</span></div>
+    <div class="bk-row"><span class="bk-label">− Entretien</span><span class="bk-val">− ${fmt(entretM)} $/m</span></div>
+    <div class="bk-row"><span class="bk-label bk-val total">Cashflow net</span><span class="bk-val total">${cf>=0?'+':''}${fmt(cf)} $/m</span></div>`;
+
+  const vBanner = document.getElementById('verdictBanner');
+  if (cf > 300 && cap >= 4.5) {
+    vBanner.className = 'verdict-banner good';
+    document.getElementById('verdictTitle').textContent = 'Excellent deal';
+    document.getElementById('verdictSub').textContent   = `+${fmt(cf)} $/mois · Cap rate ${cap.toFixed(2)} %`;
+    document.querySelector('.verdict-icon').textContent = '✓';
+  } else if (cf > 0) {
+    vBanner.className = 'verdict-banner meh';
+    document.getElementById('verdictTitle').textContent = 'Cashflow positif — marge serrée';
+    document.getElementById('verdictSub').textContent   = `+${fmt(cf)} $/mois · Peu de coussin`;
+    document.querySelector('.verdict-icon').textContent = '~';
   } else {
-    sub.textContent = `${count} annonces`;
+    vBanner.className = 'verdict-banner bad';
+    document.getElementById('verdictTitle').textContent = 'Cashflow négatif';
+    document.getElementById('verdictSub').textContent   = `Tu débourses ${fmt(Math.abs(cf))} $/mois de ta poche`;
+    document.querySelector('.verdict-icon').textContent = '✗';
   }
+
+  const chart = document.getElementById('barChart');
+  chart.innerHTML = '';
+  const vals = [1,2,3,4,5].map(y => cf*12*Math.pow(1.03, y-1));
+  const maxV = Math.max(...vals.map(Math.abs), 1);
+  vals.forEach((v, i) => {
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    col.innerHTML = `<div class="bar-fill" style="height:${Math.max(Math.abs(v)/maxV*80,4)}%;background:${v>=0?'var(--green)':'var(--red)'};opacity:.75"></div><div class="bar-year">An ${i+1}</div>`;
+    chart.appendChild(col);
+  });
 }
 
-// ── Scraper ──────────────────────────────────────────────────────────────────
-async function triggerScrape() {
-  const btn = document.getElementById('btn-scrape');
-  btn.disabled = true;
-  showBanner('running', '<span class="spinner">⟳</span> Scraping Centris en cours...');
-
-  try {
-    const res = await fetch(`${API_URL}/scrape`, { method: 'POST' });
-    if (res.status === 409) {
-      showBanner('running', '<span class="spinner">⟳</span> Scraper déjà en cours...');
-    } else if (!res.ok) {
-      throw new Error(await res.text());
-    }
-    pollScrapeStatus();
-  } catch (e) {
-    showBanner('warning', `⚠️ Impossible de contacter le backend : ${e.message}`);
-    btn.disabled = false;
-  }
-}
-
-function pollScrapeStatus() {
-  clearInterval(scrapeTimer);
-  scrapeTimer = setInterval(async () => {
-    try {
-      const res  = await fetch(`${API_URL}/scrape/status`);
-      const data = await res.json();
-      if (!data.running) {
-        clearInterval(scrapeTimer);
-        document.getElementById('btn-scrape').disabled = false;
-        hideBanner();
-        await loadDeals();
-      }
-    } catch {
-      clearInterval(scrapeTimer);
-      document.getElementById('btn-scrape').disabled = false;
-    }
-  }, 3000);
-}
-
-function showBanner(type, html) {
-  const el = document.getElementById('scraper-status-banner');
-  el.innerHTML = html;
-  el.className = `scraper-banner${type === 'running' ? ' running' : ''}`;
-  el.style.display = 'flex';
-}
-
-function hideBanner() {
-  document.getElementById('scraper-status-banner').style.display = 'none';
-}
-
-// ── Simulateur ───────────────────────────────────────────────────────────────
-async function runSimulation() {
-  const price  = parseInt(document.getElementById('sim-price').value);
-  const units  = parseInt(document.getElementById('sim-units').value);
-  const income = document.getElementById('sim-income').value;
-  const rate   = parseFloat(document.getElementById('sim-rate').value) / 100;
-  const down   = parseFloat(document.getElementById('sim-down').value) / 100;
-
-  const body = { price, units, rate, down_pct: down };
-  if (income) body.declared_income = parseInt(income);
-
-  let result;
-  try {
-    const res = await fetch(`${API_URL}/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    result = await res.json();
-  } catch {
-    // Calcul client-side si backend indisponible
-    result = calcClientSide(price, units, income ? parseInt(income) : null, rate, down);
-  }
-  renderSimResult(result, price);
-}
-
-function calcClientSide(price, units, income, rate, down) {
-  // Loyers estimés (valeurs par défaut)
-  const rentPerUnit = 1100;
-  const grossRent   = income || units * rentPerUnit;
-  const vacancy     = grossRent * 0.03;
-  const netRent     = grossRent - vacancy;
-
-  const principal   = price * (1 - down);
-  const r           = rate / 12;
-  const n           = 25 * 12;
-  const mortgage    = principal * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
-  const taxes       = price * 0.008 / 12;
-  const insurance   = 2400 / 12;
-  const maintenance = price * 0.01 / 12;
-  const totalExp    = mortgage + taxes + insurance + maintenance;
-  const cashflow    = netRent - totalExp;
-
-  const noi     = (netRent - taxes - insurance - maintenance) * 12;
-  const capRate = noi / price * 100;
-  const mrb     = price / (grossRent * 12);
-
-  return {
-    gross_rent_monthly:    grossRent,
-    vacancy_monthly:       vacancy,
-    mortgage_monthly:      mortgage,
-    taxes_monthly:         taxes,
-    insurance_monthly:     insurance,
-    maintenance_monthly:   maintenance,
-    total_expenses_monthly: totalExp,
-    cashflow_monthly:      cashflow,
-    mise_de_fonds:         price * down,
-    cap_rate_pct:          capRate,
-    mrb:                   mrb,
-    cashflow_ok:           cashflow >= 200,
-    cap_rate_ok:           capRate >= 4.5,
-    mrb_ok:                mrb <= 15,
-    score:                 cashflow >= 400 ? 8 : cashflow >= 200 ? 6 : cashflow >= 0 ? 4 : 2,
-  };
-}
-
-function renderSimResult(r, price) {
-  const cf      = r.cashflow_monthly || 0;
-  const cfColor = cf >= 200 ? 'var(--green)' : cf >= 0 ? 'var(--yellow)' : 'var(--red)';
-
-  document.getElementById('sim-result').innerHTML = `
-  <div class="result-box">
-    <h3>Résultat — ${formatPrice(price)}</h3>
-    <div class="result-cashflow" style="color:${cfColor}">
-      ${cf >= 0 ? '+' : ''}${Math.round(cf)} $/mois
-    </div>
-    <div class="result-sub">cashflow mensuel estimé</div>
-
-    <div class="result-rows">
-      <div class="result-row"><span class="label">Revenus bruts</span><span class="value">${fmt(r.gross_rent_monthly)} $/mois</span></div>
-      <div class="result-row"><span class="label">Vacance (3%)</span><span class="value">−${fmt(r.vacancy_monthly)} $</span></div>
-      <div class="result-row"><span class="label">Hypothèque</span><span class="value">−${fmt(r.mortgage_monthly)} $</span></div>
-      <div class="result-row"><span class="label">Taxes munic.</span><span class="value">−${fmt(r.taxes_monthly)} $</span></div>
-      <div class="result-row"><span class="label">Assurances</span><span class="value">−${fmt(r.insurance_monthly)} $</span></div>
-      <div class="result-row"><span class="label">Entretien (1%)</span><span class="value">−${fmt(r.maintenance_monthly)} $</span></div>
-      <div class="result-row" style="font-weight:700"><span class="label">Total dépenses</span><span class="value">${fmt(r.total_expenses_monthly)} $/mois</span></div>
-    </div>
-
-    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
-      <div class="metric">
-        <div class="metric-val">${(r.cap_rate_pct || 0).toFixed(1)}%</div>
-        <div class="metric-label">Cap rate</div>
-      </div>
-      <div class="metric">
-        <div class="metric-val">${(r.mrb || 0).toFixed(1)}x</div>
-        <div class="metric-label">MRB</div>
-      </div>
-      <div class="metric">
-        <div class="metric-val">${formatPrice(r.mise_de_fonds || 0)}</div>
-        <div class="metric-label">Mise de fonds</div>
-      </div>
-    </div>
-
-    <div class="badges">
-      <span class="badge ${r.cashflow_ok ? 'badge-ok' : 'badge-bad'}">${r.cashflow_ok ? '✓' : '✗'} Cashflow > 200$</span>
-      <span class="badge ${r.cap_rate_ok ? 'badge-ok' : 'badge-bad'}">${r.cap_rate_ok ? '✓' : '✗'} Cap rate > 4,5%</span>
-      <span class="badge ${r.mrb_ok ? 'badge-ok' : 'badge-bad'}">${r.mrb_ok ? '✓' : '✗'} MRB < 15x</span>
-    </div>
-  </div>`;
-}
-
-function simulateFromListing(l) {
-  document.getElementById('sim-price').value = l.price;
-  document.getElementById('sim-units').value = Math.min(6, Math.max(2, l.units || 2));
-  if (l.declared_income) document.getElementById('sim-income').value = l.declared_income;
-  switchTab('sim');
-  runSimulation();
-}
-
-// ── Connexion ────────────────────────────────────────────────────────────────
-async function testConnection() {
-  const el = document.getElementById('api-status-text');
-  el.textContent = 'Test en cours...';
-  try {
-    const res  = await fetch(`${API_URL}/health`, { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    el.textContent = `✓ Connecté — ${data.timestamp ? new Date(data.timestamp).toLocaleTimeString('fr-CA') : 'OK'}`;
-    el.style.color = 'var(--green)';
-  } catch {
-    el.textContent = '✗ Non connecté';
-    el.style.color = 'var(--red)';
-  }
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-function formatPrice(p) {
-  if (!p) return 'N/A';
-  if (p >= 1_000_000) return `${(p/1_000_000).toFixed(2)} M$`;
-  return `${Math.round(p/1000)} k$`;
-}
-
-function fmt(n) { return Math.round(n || 0).toLocaleString('fr-CA'); }
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-loadDeals();
-</script>
-
-<!-- Service Worker -->
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
+// ── Init ──────────────────────────────────────────────────────────────────────
+fetchListings();
+calc();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
