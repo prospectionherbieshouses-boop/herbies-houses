@@ -152,6 +152,20 @@ def scrape_status():
     return scraper_status
 
 
+@app.post("/listings/import")
+def import_listings(payload: dict):
+    """Reçoit des annonces scrapées localement et les sauvegarde."""
+    listings = payload.get("listings", [])
+    if not listings:
+        raise HTTPException(status_code=400, detail="Aucune annonce reçue")
+    _save_listings(listings)
+    scraper_status["count"]    = len(listings)
+    scraper_status["last_run"] = datetime.now().isoformat()
+    scraper_status["running"]  = False
+    scraper_status["error"]    = None
+    return {"message": f"{len(listings)} annonces importées", "count": len(listings)}
+
+
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest):
     """Calcule le cashflow et le score pour une propriété donnée."""
