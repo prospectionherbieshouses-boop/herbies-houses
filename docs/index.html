@@ -398,7 +398,7 @@
         </div>
         <div class="settings-row">
           <div style="flex:1">
-            <input type="text" id="api-url" value="http://localhost:8000"
+            <input type="text" id="api-url" value="http://web-production-ca9a1.up.railway.app"
               style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px">
           </div>
         </div>
@@ -433,7 +433,7 @@
 
 <script>
 // ── Config ──────────────────────────────────────────────────────────────────
-let API_URL    = localStorage.getItem('api_url') || 'http://localhost:8000';
+let API_URL    = localStorage.getItem('api_url') || 'http://web-production-ca9a1.up.railway.app';
 let listings   = JSON.parse(localStorage.getItem('listings') || '[]');
 let scrapeTimer = null;
 
