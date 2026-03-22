@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Fond arrondi -->
+  <rect width="192" height="192" rx="40" fill="#6366f1"/>
+  <!-- Maison -->
+  <path d="M96 40 L148 85 L148 148 L110 148 L110 112 L82 112 L82 148 L44 148 L44 85 Z"
+        fill="white" opacity="0.95"/>
+  <!-- Fenêtre gauche -->
+  <rect x="62" y="95" width="16" height="16" rx="3" fill="#6366f1"/>
+  <!-- Fenêtre droite -->
+  <rect x="114" y="95" width="16" height="16" rx="3" fill="#6366f1"/>
+  <!-- Cheminée / dollar sign -->
+  <text x="96" y="82" text-anchor="middle" font-family="system-ui" font-size="22" font-weight="800" fill="#6366f1">$</text>
+</svg>
