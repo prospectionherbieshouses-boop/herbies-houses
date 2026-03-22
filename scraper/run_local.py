@@ -29,9 +29,22 @@ def main():
     print("=" * 50)
     print()
 
-    # 1. Scraper Centris
+    # 1. Charger le cache existant
+    cache = {}
+    if DATA_FILE.exists():
+        try:
+            existing = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+            for l in existing.get("listings", []):
+                if l.get("declared_income"):
+                    cache[l["id"]] = l
+            print(f"  Cache chargé : {len(cache)} annonces déjà connues")
+        except Exception:
+            pass
+    print()
+
+    # 2. Scraper Centris
     print("Étape 1 — Scraping Centris...")
-    listings = scrape_centris(max_price=2_000_000)
+    listings = scrape_centris(max_price=2_000_000, cache=cache)
 
     if not listings:
         print("Aucune annonce trouvée. Vérifiez votre connexion internet.")

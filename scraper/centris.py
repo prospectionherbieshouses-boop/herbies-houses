@@ -27,8 +27,13 @@ SEARCH_CITIES = [
 ]
 
 
-def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
-    """Scrape les plex à vendre dans toutes les villes cibles."""
+def scrape_centris(max_price: int = 2_000_000, cache: dict = None) -> list[dict]:
+    """Scrape les plex à vendre dans toutes les villes cibles.
+
+    cache : dict {id -> listing} des annonces déjà connues avec revenus déclarés.
+            Permet d'éviter de revisiter les pages déjà scrapées.
+    """
+    cache = cache or {}
     all_listings = []
     seen_ids     = set()
 
@@ -37,9 +42,9 @@ def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
         print(f"\n  Ville : {city_name}")
         try:
             from playwright.sync_api import sync_playwright
-            listings = _scrape_playwright(max_price, search_url)
+            listings = _scrape_playwright(max_price, search_url, cache)
         except ImportError:
-            listings = _scrape_requests(max_price, search_url)
+            listings = _scrape_requests(max_price, search_url, cache)
 
         new = [l for l in listings if l["id"] not in seen_ids]
         for l in new:
@@ -50,7 +55,7 @@ def scrape_centris(max_price: int = 2_000_000) -> list[dict]:
     return all_listings
 
 
-def _scrape_playwright(max_price: int, search_url: str = "") -> list[dict]:
+def _scrape_playwright(max_price: int, search_url: str = "", cache: dict = None) -> list[dict]:
     """Scrape via Playwright (navigateur réel, contourne le bot-detection)."""
     from playwright.sync_api import sync_playwright
     from bs4 import BeautifulSoup
@@ -157,7 +162,7 @@ def _fetch_declared_income(url: str, session) -> int | None:
     return None
 
 
-def _scrape_requests(max_price: int, search_url: str = "") -> list[dict]:
+def _scrape_requests(max_price: int, search_url: str = "", cache: dict = None) -> list[dict]:
     """Fallback : scrape via requests + BeautifulSoup."""
     import requests
     from bs4 import BeautifulSoup
@@ -193,8 +198,12 @@ def _scrape_requests(max_price: int, search_url: str = "") -> list[dict]:
             if not listing or listing["id"] in seen_ids or listing["price"] > max_price:
                 continue
 
-            # Visiter la page d'annonce pour obtenir les vrais revenus déclarés
-            if listing.get("url") and not listing.get("declared_income"):
+            # Réutiliser le cache si l'annonce est déjà connue avec revenus
+            lid = listing["id"]
+            if cache and lid in cache and cache[lid].get("declared_income"):
+                listing["declared_income"] = cache[lid]["declared_income"]
+                print(f"    Cache : {listing['address']} → {listing['declared_income']:,}$/mois")
+            elif listing.get("url") and not listing.get("declared_income"):
                 income = _fetch_declared_income(listing["url"], session)
                 if income:
                     listing["declared_income"] = income
