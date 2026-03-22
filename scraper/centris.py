@@ -106,6 +106,37 @@ def _scrape_playwright(max_price: int) -> list[dict]:
     return listings
 
 
+def _fetch_declared_income(url: str, session) -> int | None:
+    """Visite la page d'annonce et extrait les revenus bruts déclarés."""
+    try:
+        from bs4 import BeautifulSoup
+        time.sleep(2)  # délai anti-scraping
+        resp = session.get(url, timeout=20)
+        if resp.status_code != 200:
+            return None
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        # Chercher "Revenu(s) brut(s)" dans les tableaux de données
+        for el in soup.find_all(string=re.compile(r"revenu.{0,10}brut", re.IGNORECASE)):
+            parent = el.find_parent()
+            if not parent:
+                continue
+            # Chercher la valeur dans les éléments voisins
+            sibling = parent.find_next_sibling()
+            if sibling:
+                val = _to_int(sibling.get_text())
+                if val and 1_000 < val < 500_000:
+                    # Centris affiche souvent en annuel, convertir en mensuel
+                    return val // 12 if val > 20_000 else val
+            # Parfois dans le même élément
+            val = _to_int(parent.get_text())
+            if val and 1_000 < val < 500_000:
+                return val // 12 if val > 20_000 else val
+    except Exception:
+        pass
+    return None
+
+
 def _scrape_requests(max_price: int) -> list[dict]:
     """Fallback : scrape via requests + BeautifulSoup."""
     import requests
@@ -141,6 +172,14 @@ def _scrape_requests(max_price: int) -> list[dict]:
             listing = _parse_card(card)
             if not listing or listing["id"] in seen_ids or listing["price"] > max_price:
                 continue
+
+            # Visiter la page d'annonce pour obtenir les vrais revenus déclarés
+            if listing.get("url") and not listing.get("declared_income"):
+                income = _fetch_declared_income(listing["url"], session)
+                if income:
+                    listing["declared_income"] = income
+                    print(f"    Revenus déclarés : {listing['address']} → {income:,}$/mois")
+
             listings.append(listing)
             seen_ids.add(listing["id"])
 
